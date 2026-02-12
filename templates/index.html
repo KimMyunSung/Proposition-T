@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Payment Test</title>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
+        .btn { 
+            background-color: #7F00FF; color: white; 
+            padding: 15px 30px; font-size: 20px; border: none; border-radius: 10px; cursor: pointer;
+            width: 100%; margin-top: 20px;
+        }
+        #status { margin-top: 20px; color: #555; }
+    </style>
+</head>
+<body>
+    <h1>☕ 파이 결제 테스트</h1>
+    <p id="username">사용자 확인 중...</p>
+    
+    <button class="btn" onclick="pay()">1 Pi 결제하기</button>
+
+    <div id="status">대기 중...</div>
+
+    <script>
+        // 1. 초기화
+        Pi.init({ version: "2.0", sandbox: false }); // 테스트니까 sandbox: true
+
+        // 2. 사용자 인증
+        async function auth() {
+            try {
+                const scopes = ['username', 'payments'];
+                const authResult = await Pi.authenticate(scopes, onIncompletePaymentFound);
+                document.getElementById('username').innerText = "환영합니다, " + authResult.user.username + "님!";
+            } catch (err) {
+                alert("인증 실패: " + err.message);
+            }
+        }
+        auth(); // 페이지 켜지면 바로 실행
+
+        // 3. 결제 버튼 누르면 실행
+        function pay() {
+            Pi.createPayment({
+                amount: 1, // 1 파이
+                memo: "테스트 아이템 구매", 
+                metadata: { type: "test_item" }
+            }, {
+                // (A) 서버 승인 준비
+                onReadyForServerApproval: function(paymentId) {
+                    document.getElementById('status').innerText = "서버 승인 요청 중...";
+                    
+                    // 우리 서버(app.py)의 /approve 호출
+                    fetch('/approve', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ paymentId: paymentId })
+                    }).then(() => {
+                        console.log("서버 승인 완료!");
+                    });
+                },
+                // (B) 서버 완료 준비 (블록체인 전송 후)
+                onReadyForServerCompletion: function(paymentId, txid) {
+                    document.getElementById('status').innerText = "결제 마무리 중...";
+                    
+                    // 우리 서버(app.py)의 /complete 호출
+                    fetch('/complete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ paymentId: paymentId, txid: txid })
+                    }).then(() => {
+                        document.getElementById('status').innerText = "✅ 결제 성공!";
+                        alert("결제가 성공적으로 완료되었습니다!");
+                    });
+                },
+                onCancel: function(paymentId) { 
+                    document.getElementById('status').innerText = "결제 취소됨";
+                },
+                onError: function(error, payment) { 
+                    document.getElementById('status').innerText = "에러: " + error.message;
+                }
+            });
+        }
+
+        function onIncompletePaymentFound(payment) {
+            // 미완료 건 처리 로직 (테스트 땐 패스)
+            console.log("미완료 건 발견");
+        }
+    </script>
+</body>
+</html>
