@@ -6,6 +6,7 @@ const path = require('path');
 const { NotionToMarkdown } = require('notion-to-md');
 const marked = require('marked'); 
 // notion 객체는 이미 있으실 테니, 그 아래에 n2m만 추가 선언해 줍니다.
+const notion = new Client({ auth: process.env.NOTION_TOKEN });
 const n2m = new NotionToMarkdown({ notionClient: notion });
 const app = express();
 app.use(cors());
@@ -14,7 +15,6 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public'))); 
 
 // 노션 클라이언트 초기화
-const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const databaseId = process.env.NOTION_DATABASE_ID;
 
 app.get('/api/notion', async (req, res) => {
