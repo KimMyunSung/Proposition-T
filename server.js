@@ -67,11 +67,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html')); 
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Proposition T Server is running on port ${PORT}`);
-    
-    // 상세 페이지 라우터 (반드시 app.listen 보다 위에 위치해야 합니다)
+        // 상세 페이지 라우터 (반드시 app.listen 보다 위에 위치해야 합니다)
 app.get('/post/:id', async (req, res) => {
     const pageId = req.params.id;
 
@@ -109,4 +105,6 @@ app.get('/post/:id', async (req, res) => {
 
 // 서버 포트 설정 및 실행 (반드시 파일의 가장 마지막에 위치해야 합니다)
 const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Proposition T Server is running on port ${PORT}`);
 });
