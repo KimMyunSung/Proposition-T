@@ -7,12 +7,28 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: #000; color: #00ff41; font-family: 'Fira Code', 'Noto Sans KR', monospace; line-height: 1.6; }
-        .container { width: 90%; max-width: 1000px; margin: 60px auto; background: rgba(0, 10, 0, 0.85); border: 1px solid rgba(0, 255, 65, 0.4); padding: 50px; }
-        .header-info { border-bottom: 1px dashed rgba(0, 255, 65, 0.5); padding-bottom: 20px; margin-bottom: 30px; }
-        h1 { font-size: 2rem; margin-bottom: 15px; }
-        .meta-data { font-size: 0.9rem; color: rgba(0, 255, 65, 0.8); display: flex; gap: 20px; }
-        .content { font-size: 1.1rem; color: #e0ffe6; white-space: pre-wrap; min-height: 300px; }
-        .btn-back { display: inline-block; margin-top: 40px; padding: 10px 20px; color: #000; background-color: #00ff41; text-decoration: none; font-weight: 600; }
+        .container { width: 90%; max-width: 900px; margin: 40px auto; background: rgba(0, 15, 0, 0.9); border: 1px solid #00ff41; padding: 40px; box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); }
+        
+        .header-info { border-bottom: 2px solid #00ff41; padding-bottom: 20px; margin-bottom: 30px; }
+        h1 { font-size: 1.8rem; margin-bottom: 15px; color: #00ff41; text-shadow: 0 0 5px #00ff41; }
+        .meta-data { font-size: 0.85rem; color: rgba(0, 255, 65, 0.7); display: flex; gap: 25px; }
+        
+        /* 본문 및 코드 박스 스타일 */
+        .content { font-size: 1rem; color: #e0ffe6; }
+        pre { 
+            background: rgba(0, 40, 0, 0.5); 
+            border: 1px solid rgba(0, 255, 65, 0.3); 
+            padding: 20px; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+            margin: 20px 0;
+            color: #00ff41;
+            font-family: 'Fira Code', monospace;
+        }
+        code { color: #f8f8f2; }
+
+        .btn-back { display: inline-block; margin-top: 40px; padding: 8px 18px; color: #000; background-color: #00ff41; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        .btn-back:hover { background-color: #fff; box-shadow: 0 0 15px #fff; }
     </style>
 </head>
 <body>
@@ -20,15 +36,15 @@
         <div class="header-info">
             <h1><%= post.title %></h1>
             <div class="meta-data">
-                <span>DATE: <%= post.date %></span>
-                <span>SENDER: <%= post.sender %></span>
-                <span>RECEIVER: <%= post.receiver %></span>
+                <span>[DATE] <%= post.date %></span>
+                <span>[FROM] <%= post.sender %></span>
+                <span>[TO] <%= post.receiver %></span>
             </div>
         </div>
         <div class="content">
             <%- post.content %> 
         </div>
-        <a href="/" class="btn-back">[ RETURN TO MAIN ]</a>
+        <a href="/" class="btn-back">< RETURN_TO_TERMINAL</a>
     </div>
 </body>
 </html>

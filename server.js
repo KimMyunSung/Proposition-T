@@ -74,10 +74,11 @@ app.get('/post/:id', async (req, res) => {
     try {
         const page = await notion.pages.retrieve({ page_id: pageId });
         
-        const title = page.properties['Name']?.title[0]?.plain_text || '제목 없음';
-        const date = page.properties['Date']?.date?.start || '날짜 미상';
-        const sender = page.properties['Sender']?.rich_text[0]?.plain_text || 'T';
-        const receiver = page.properties['Receiver']?.rich_text[0]?.plain_text || '수신자 미상';
+        // server.js 내부 수정 예시
+const title = page.properties['Name']?.title[0]?.plain_text || 'Untitled';
+const date = page.properties['Date']?.date?.start || 'N/A';
+const sender = page.properties['Sender']?.rich_text[0]?.plain_text || 'T';
+const receiver = page.properties['Receiver']?.rich_text[0]?.plain_text || 'All Agents'; // '수신자' 컬럼명 확인!
 
         const mdblocks = await n2m.pageToMarkdown(pageId);
         const mdString = n2m.toMarkdownString(mdblocks);
