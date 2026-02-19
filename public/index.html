@@ -182,7 +182,10 @@
 
             data.forEach(item => {
                 const tr = document.createElement('tr');
-                
+                // 👉 [여기에 아래 3줄 코드 추가] 
+                tr.onclick = () => {
+                    window.location.href = `/post/${item.id}`; 
+                };
                 // 👉 [여기에 클릭 이벤트 추가] 행을 클릭하면 상세 페이지로 이동합니다.
                 tr.onclick = () => {
                     // 일단 클릭이 잘 되는지 확인용 알림창 (확인 후 지우셔도 됩니다)
