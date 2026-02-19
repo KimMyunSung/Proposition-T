@@ -7,17 +7,25 @@ const path = require('path');
 const app = express();
 app.use(cors());
 
-// 정적 파일 제공 폴더 설정 (index.html 위치에 맞게 조정 필요)
+// 정적 파일 제공
 app.use(express.static(path.join(__dirname, 'public'))); 
 
-// 노션 클라이언트 정상 초기화
+// 노션 클라이언트 초기화
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const databaseId = process.env.NOTION_DATABASE_ID;
 
 app.get('/api/notion', async (req, res) => {
     try {
-        const response = await notion.databases.query({
-            database_id: databaseId,
+        // 1. Database 정보 조회하여 Data Source ID 추출
+        const database = await notion.databases.retrieve({
+            database_id: databaseId
+        });
+        
+        const dataSourceId = database.data_sources[0].id; //
+
+        // 2. dataSources.query 메서드로 데이터 요청 (databases.query 아님)
+        const response = await notion.dataSources.query({
+            data_source_id: dataSourceId, //
             sorts: [
                 {
                     property: 'Date', 
@@ -29,13 +37,13 @@ app.get('/api/notion', async (req, res) => {
         const messages = response.results.map((page) => {
             const props = page.properties;
             
-            // 1. 노션 환경에 상관없이 '제목' 속성을 동적으로 안전하게 추출
+            // 제목 속성 추출
             const titleKey = Object.keys(props).find(key => props[key].type === 'title');
             const title = titleKey && props[titleKey].title.length > 0 
                 ? props[titleKey].title[0].plain_text 
                 : '제목 없음';
             
-            // 2. 나머지 속성들을 방어적 코드(?.)로 안전하게 추출
+            // 나머지 속성 추출
             const date = props['Date']?.date?.start || '-';
             const status = props['Status']?.select?.name || '-';
             const receiver = props['수신']?.rich_text?.[0]?.plain_text || '-';
