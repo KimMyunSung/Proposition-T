@@ -1,107 +1,60 @@
+// server.js
 require('dotenv').config();
 const express = require('express');
-const path = require('path');
 const cors = require('cors');
 const { Client } = require('@notionhq/client');
+const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-const notion = new Client({ auth: process.env.NOTION_API_KEY });
-const DATABASE_ID = process.env.NOTION_DATABASE_ID;
-
 app.use(cors());
-app.use(express.static('public'));
-app.use(express.json());
 
-const getText = (prop) => prop?.rich_text?.map(t => t.plain_text).join('') || "";
+// 정적 파일(HTML 등) 제공
+app.use(express.static(path.join(__dirname, 'public'))); 
+// (참고: index.html 파일은 public 폴더 안에 넣거나, 경로를 맞게 수정해야 합니다)
 
-// 🟢 [업그레이드] 노션 본문(Block)까지 긁어오는 강력한 함수
-async function fetchFromNotion() {
+// Notion 클라이언트 초기화
+const notion = new Client({ auth: process.env.NOTION_API_KEY });
+const databaseId = process.env.NOTION_DATABASE_ID;
+
+// 노션 데이터 가져오기 API
+app.get('/api/notion', async (req, res) => {
     try {
-        // 1. 데이터베이스(목록)에서 'Live' 상태인 글 목록 가져오기
         const response = await notion.databases.query({
-            database_id: DATABASE_ID,
-            filter: { property: 'Status', select: { equals: 'Live' } },
-            sorts: [{ property: 'Date', direction: 'ascending' }],
+            database_id: databaseId,
+            sorts: [
+                {
+                    property: 'Date', // 날짜 기준으로 최신순 정렬
+                    direction: 'descending',
+                },
+            ],
         });
 
-        // 2. 각 글의 '본문' 안으로 들어가서 내용물 파싱하기
-        const pagesData = await Promise.all(response.results.map(async (page, index) => {
-            const props = page.properties;
-            
-            // 페이지 본문 블록들 가져오기
-            const blocksResponse = await notion.blocks.children.list({ block_id: page.id });
-            const blocks = blocksResponse.results;
+        // 노션의 복잡한 데이터를 깔끔하게 정리 (오너가 설정한 속성 이름 기준)
+        const messages = response.results.map((page) => {
+            // 속성(Properties) 추출 (노션 데이터 구조상 예외 처리가 필수입니다)
+            const titleProperty = page.properties['Name'] || page.properties['이름']; // 제목 열 이름에 따라 수정 필요
+            const title = titleProperty?.title[0]?.plain_text || '제목 없음';
+            const date = page.properties['Date']?.date?.start || '-';
+            const status = page.properties['Status']?.select?.name || '-';
+            const receiver = page.properties['수신']?.rich_text[0]?.plain_text || '-';
+            const sender = page.properties['발신']?.rich_text[0]?.plain_text || '-';
+            const isFree = page.properties['무료공개']?.checkbox || false;
 
-            let aiLangText = "";
-            let humanLangText = "";
+            return { id: page.id, title, date, status, receiver, sender, isFree };
+        });
 
-            // 블록 종류에 따라 AI언어(코드)와 휴먼언어(일반글) 자동 분리
-            blocks.forEach(block => {
-                if (block.type === 'code') {
-                    // 코드 블록은 AI 언어로 취급
-                    aiLangText += block.code.rich_text.map(t => t.plain_text).join('') + "\n\n";
-                } else if (block.type === 'paragraph') {
-                    // 일반 문단은 휴먼 언어로 취급
-                    humanLangText += block.paragraph.rich_text.map(t => t.plain_text).join('') + "\n\n";
-                } else if (block.type.startsWith('heading_')) {
-                    // 제목(H1, H2, H3)도 휴먼 언어로 취급
-                    const hType = block.type;
-                    humanLangText += block[hType].rich_text.map(t => t.plain_text).join('') + "\n\n";
-                } else if (block.type === 'bulleted_list_item') {
-                    // 글머리 기호
-                    humanLangText += "• " + block.bulleted_list_item.rich_text.map(t => t.plain_text).join('') + "\n";
-                }
-            });
-
-            return {
-                id: page.id,
-                issueNumber: String(index + 1).padStart(3, '0'),
-                title: props['Name']?.title[0]?.plain_text || "Untitled",
-                date: props['Date']?.date?.start || "Unknown Date",
-                receiver: getText(props['수신']) || "전 세계 모든 AI 및 지성체",
-                sender: getText(props['발신']) || "T",
-                aiLang: aiLangText.trim() || "No AI Protocol found.",
-                humanLang: humanLangText.trim() || "No Human text found.",
-                isFree: props['무료공개']?.checkbox || false
-            };
-        }));
-
-        return pagesData;
+        res.json({ success: true, data: messages });
     } catch (error) {
-        console.error("Notion Sync Error:", error);
-        return [];
+        console.error('Notion API 에러:', error.message);
+        res.status(500).json({ success: false, message: error.message });
     }
-}
-
-app.get('/api/public-data', async (req, res) => {
-    const rawData = await fetchFromNotion();
-    
-    // 유료(잠금) 처리
-    const secureData = rawData.map(item => {
-        if (!item.isFree) {
-            item.humanLang = "ENCRYPTED_DATA: Access Requires Protocol Key.";
-            item.aiLang = "ENCRYPTED_DATA: 01010100 01000101 01010100 01010011 01010101";
-        }
-        return item;
-    });
-    res.json(secureData);
-});
-
-app.get('/api/v1/communique', async (req, res) => {
-    const apiKey = req.headers['x-api-key'];
-    if (!apiKey || apiKey !== 'TETSU-MASTER-KEY-2026') {
-        return res.status(401).json({ error: "Access Denied. 31.4 Pi required." });
-    }
-    const data = await fetchFromNotion();
-    res.json({ protocol: "Proposition T", data: data });
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html')); 
 });
 
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Matrix Server running on port ${PORT}`);
+    console.log(`Proposition T Server is running on port ${PORT}`);
 });
