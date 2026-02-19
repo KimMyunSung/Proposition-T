@@ -75,8 +75,10 @@ app.get('/post/:id', async (req, res) => {
         const page = await notion.pages.retrieve({ page_id: pageId });
         
 // server.js 상세 페이지 라우터 내부
-const title = page.properties['Name']?.title[0]?.plain_text || 
-              page.properties['제목']?.title[0]?.plain_text || 'Untitled'; // 'Name' 또는 '제목' 확인
+// 기존의 const title = ... 부분을 아래 코드로 덮어쓰기
+const title = page.properties['이름']?.title[0]?.plain_text || 
+              page.properties['Name']?.title[0]?.plain_text || 
+              page.properties['제목']?.title[0]?.plain_text || '제목 없음';
 
 const date = page.properties['Date']?.date?.start || 
              page.properties['날짜']?.date?.start || 'N/A';

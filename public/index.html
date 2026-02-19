@@ -54,19 +54,48 @@
             color: rgba(0, 255, 65, 0.7);
         }
 
-        /* 리스트 테이블 스타일 */
-        /* 테이블 레이아웃 고정 */
-table {
-    table-layout: fixed; /* 컬럼 폭 고정 */
-    width: 100%;
-}
+/* 리스트 테이블 기본 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* 찌그러짐 방지: 너비 고정 */
+            font-size: 0.95rem;
+        }
 
-th, td {
-    overflow: hidden;
-    text-overflow: ellipsis; /* 글자가 길면 ... 처리 */
-    white-space: nowrap;
-    padding: 12px 10px;
-}
+        th {
+            background-color: rgba(0, 255, 65, 0.1);
+            color: #00ff41;
+            text-transform: uppercase;
+            padding: 15px 10px;
+            text-align: left;
+            border-bottom: 2px solid #00ff41;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+            color: #e0ffe6;
+            vertical-align: middle;
+            word-break: keep-all; /* 단어 단위로 깔끔하게 줄바꿈 */
+        }
+
+        tr:hover { background-color: rgba(0, 255, 65, 0.1); cursor: pointer; transition: 0.3s; }
+
+        /* [핵심] 각 컬럼별 고정 너비 할당 (합쳐서 100%) */
+        th:nth-child(1), td:nth-child(1) { width: 42%; } /* NAME */
+        th:nth-child(2), td:nth-child(2) { width: 14%; } /* DATE */
+        th:nth-child(3), td:nth-child(3) { width: 10%; text-align: center; } /* STATUS */
+        th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; } /* SENDER */
+        th:nth-child(5), td:nth-child(5) { width: 17%; } /* RECEIVER */
+        th:nth-child(6), td:nth-child(6) { width: 7%; text-align: center; }  /* FREE */
+
+        /* 첫 번째 제목 열만 줄바꿈 허용 */
+        td:nth-child(1) {
+            white-space: normal;
+            line-height: 1.5;
+            font-weight: 500;
+        }
 
 /* 컬럼별 폭 지정 (오너의 취향에 맞게 조정 가능) */
 th:nth-child(1), td:nth-child(1) { width: 45%; } /* Name */
