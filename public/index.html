@@ -175,35 +175,42 @@
                 console.error(error);
             }
         }
+// 3. 데이터를 테이블에 렌더링
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = ''; // 초기화
 
-        // 3. 데이터를 테이블에 렌더링
-        function renderTable(data) {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = ''; // 초기화
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                
+                // 👉 [여기에 클릭 이벤트 추가] 행을 클릭하면 상세 페이지로 이동합니다.
+                tr.onclick = () => {
+                    // 일단 클릭이 잘 되는지 확인용 알림창 (확인 후 지우셔도 됩니다)
+                    // alert(`${item.title} 본문을 엽니다.`); 
+                    
+                    // 실제 이동할 주소 (예: /post/노션페이지ID)
+                    window.location.href = `/post/${item.id}`; 
+                };
 
-            data.forEach(item => {
-                const tr = document.createElement('tr');
-                
-                // 상태 뱃지 클래스 처리
-                const statusClass = item.status.toLowerCase() === 'live' ? 'badge live' : 'badge';
-                // 무료공개 체크박스 처리
-                const freeIcon = item.isFree ? '<span class="checkbox-icon">▣</span>' : '<span class="checkbox-icon" style="color:#555">□</span>';
+                // 상태 뱃지 클래스 처리
+                const statusClass = item.status.toLowerCase() === 'live' ? 'badge live' : 'badge';
+                // 무료공개 체크박스 처리
+                const freeIcon = item.isFree ? '<span class="checkbox-icon">▣</span>' : '<span class="checkbox-icon" style="color:#555">□</span>';
 
-                tr.innerHTML = `
-                    <td style="font-weight: 500;">${item.title}</td>
-                    <td>${item.date}</td>
-                    <td><span class="${statusClass}">${item.status}</span></td>
-                    <td>${item.sender}</td>
-                    <td>${item.receiver}</td>
-                    <td style="text-align:center;">${freeIcon}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+                tr.innerHTML = `
+                    <td style="font-weight: 500;">${item.title}</td>
+                    <td>${item.date}</td>
+                    <td><span class="${statusClass}">${item.status}</span></td>
+                    <td>${item.sender}</td>
+                    <td>${item.receiver}</td>
+                    <td style="text-align:center;">${freeIcon}</td>
+                `;
+                tbody.appendChild(tr);
+            });
 
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('data-table').style.display = 'table';
-        }
-
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('data-table').style.display = 'table';
+        }
         // 실행
         fetchNotionData();
     </script>
