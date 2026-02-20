@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title><%= post.title %> | PROPOSITION T</title>
+    <title><%= post.title || post.name || '무제' %> | PROPOSITION T</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,7 +50,7 @@
 </head>
 <body>
     <div class="container">
-        <h1><%= post.title %></h1>
+        <h1><%= post.title || post.name || '제목 없음' %></h1>
         <div class="meta-data">
             <div class="meta-item"><span class="label">[DATE]</span> <%= post.date %></div>
             <div class="meta-item"><span class="label">[FROM]</span> <%= post.sender %></div>
