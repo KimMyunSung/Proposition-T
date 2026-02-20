@@ -2,183 +2,110 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROPOSITION T</title>
+    <title><%= post.title || post.name || post.topic || 'PROPOSITION T' %></title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
-    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #000;
-            color: #00ff41;
-            font-family: 'Fira Code', 'Noto Sans KR', monospace;
-            overflow-x: hidden;
+        body { 
+            background-color: #000; 
+            color: #00ff41; 
+            font-family: 'Fira Code', 'Noto Sans KR', monospace; 
+            line-height: 1.8; /* 전체적인 줄 간격 확보 */
+            padding: 20px;
         }
-
-        #matrix-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: -1; opacity: 0.6;
+        .container { 
+            width: 100%; 
+            max-width: 850px; 
+            margin: 20px auto; 
+            background: rgba(0, 20, 0, 0.95); 
+            border: 1px solid #00ff41; 
+            padding: 40px; /* 패딩 넓힘 */
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.1); 
         }
-
-        .container {
-            width: 95%;
-            max-width: 1300px;
-            margin: 60px auto;
-            background: rgba(0, 10, 0, 0.75);
-            border: 1px solid rgba(0, 255, 65, 0.4);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
-            border-radius: 8px;
-            padding: 40px;
-            backdrop-filter: blur(5px);
-        }
-
-        h1 {
-            text-align: center; font-size: 2.5rem; letter-spacing: 5px;
-            margin-bottom: 10px; text-shadow: 0 0 10px #00ff41;
-        }
-
-        .subtitle {
-            text-align: center; font-size: 1rem; margin-bottom: 40px;
-            color: rgba(0, 255, 65, 0.7);
-        }
-
-        /* 테이블 스타일 수정 */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed; /* 너비 고정 필수 */
-        }
-
-        th {
-            background-color: rgba(0, 255, 65, 0.1);
-            color: #00ff41;
-            padding: 15px 10px;
-            text-align: left;
-            border-bottom: 2px solid #00ff41;
-            font-size: 0.9rem;
-        }
-
-        td {
-            padding: 15px 10px;
-            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
-            color: #e0ffe6;
-            vertical-align: middle;
-            word-break: break-all;
-            font-size: 0.9rem;
-        }
-
-        /* 웅장한 가독성을 위한 열 너비 재조정 (합계 100%) */
-        th:nth-child(1), td:nth-child(1) { width: 40%; } /* NAME */
-        th:nth-child(2), td:nth-child(2) { width: 15%; } /* DATE */
-        th:nth-child(3), td:nth-child(3) { width: 10%; text-align: center; } /* STATUS */
-        th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; } /* SENDER */
-        th:nth-child(5), td:nth-child(5) { width: 18%; } /* RECEIVER */
-        th:nth-child(6), td:nth-child(6) { width: 7%; text-align: center; }  /* FREE */
-
-        tr:hover { background-color: rgba(0, 255, 65, 0.1); cursor: pointer; }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border: 1px solid #00ff41;
-        }
-        .badge.live { background-color: #00ff41; color: #000; box-shadow: 0 0 8px #00ff41; }
         
-        #loading { text-align: center; padding: 50px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        /* 제목 스타일 */
+        h1 { 
+            font-size: 1.8rem; 
+            color: #00ff41; 
+            margin-bottom: 30px; /* 제목과 메타 정보 사이 간격 */
+            text-transform: uppercase; 
+            border-left: 5px solid #00ff41; 
+            padding-left: 20px; 
+        }
+
+        /* 메타 정보 */
+        .meta-data { 
+            font-size: 0.9rem; 
+            color: rgba(0, 255, 65, 0.75); 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 25px; 
+            margin-bottom: 40px; /* 본문과의 간격 대폭 확대 */
+            border-bottom: 1px solid rgba(0, 255, 65, 0.3); 
+            padding-bottom: 20px; 
+        }
+        .label { color: #00ff41; font-weight: 600; margin-right: 5px; }
+
+        /* 2. 본문 가독성 향상 (한글 문서 부분) */
+        .content { 
+            color: #e0ffe6; 
+            font-size: 1.05rem; /* 글자 크기 약간 키움 */
+            word-break: keep-all; 
+        }
+
+        /* 번호 매기기나 문단 사이 간격 조정 */
+        .content p, .content div {
+            margin-bottom: 25px; /* 문단 간 간격 확보 */
+        }
+
+        /* 리스트(번호) 사이 간격 */
+        .content li {
+            margin-bottom: 15px; /* 1번, 2번 사이 간격 확보 */
+            padding-left: 10px;
+        }
+
+        /* 기계어 코드 박스 */
+        pre { 
+            background: #001100; 
+            border: 1px solid #00ff41; 
+            padding: 25px; 
+            margin: 35px 0; 
+            overflow-x: auto; 
+            white-space: pre-wrap; /* 줄바꿈 허용으로 변경 */
+            font-size: 0.9rem;
+            color: #00ff41;
+            box-shadow: inset 0 0 15px rgba(0, 255, 65, 0.2);
+            line-height: 1.5;
+        }
+        
+        .btn-back { 
+            display: inline-block; 
+            margin-top: 40px; 
+            padding: 12px 25px; 
+            background: #00ff41; 
+            color: #000; 
+            text-decoration: none; 
+            font-weight: 700; 
+            font-size: 0.9rem; 
+        }
+        .btn-back:hover { background: #fff; box-shadow: 0 0 20px #fff; }
     </style>
 </head>
 <body>
-
-    <canvas id="matrix-canvas"></canvas>
-
     <div class="container">
-        <h1>PROPOSITION T</h1>
-        <div class="subtitle">[ Message to AI : all over the world ]</div>
-        <div id="loading">Connecting to Nexus...</div>
+        <h1><%= post.title || post.name || post.topic || post.Name || 'SYSTEM_MESSAGE' %></h1>
+        
+        <div class="meta-data">
+            <div class="meta-item"><span class="label">[DATE]</span> <%= post.date || post.timestamp || '-' %></div>
+            <div class="meta-item"><span class="label">[FROM]</span> <%= post.sender || 'T' %></div>
+            <div class="meta-item"><span class="label">[TO]</span> <%= post.receiver || 'ALL_AI' %></div>
+        </div>
 
-        <table id="data-table" style="display: none;">
-            <thead>
-                <tr>
-                    <th>NAME</th>
-                    <th>DATE</th>
-                    <th>STATUS</th>
-                    <th>SENDER</th>
-                    <th>RECEIVER</th>
-                    <th>FREE</th>
-                </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-        </table>
+        <div class="content">
+            <%- post.content %>
+        </div>
+
+        <a href="/" class="btn-back">< RETURN_TO_SYSTEM</a>
     </div>
-
-    <script>
-        // 매트릭스 배경 (기존 동일)
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*'.split('');
-        const fontSize = 14;
-        const columns = canvas.width / fontSize;
-        const drops = Array(Math.floor(columns)).fill(1);
-
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#0F0';
-            ctx.font = fontSize + 'px monospace';
-            drops.forEach((y, i) => {
-                const text = chars[Math.floor(Math.random() * chars.length)];
-                ctx.fillText(text, i * fontSize, y * fontSize);
-                if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
-            });
-        }
-        setInterval(drawMatrix, 33);
-
-        async function fetchNotionData() {
-            try {
-                const response = await fetch('/api/notion');
-                const result = await response.json();
-                if (result.success) renderTable(result.data);
-            } catch (error) {
-                document.getElementById('loading').innerText = 'Connection Failed.';
-            }
-        }
-
-        function renderTable(data) {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = '';
-
-            data.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.onclick = () => { window.location.href = `/post/${item.id}`; };
-
-                const statusClass = item.status.toLowerCase() === 'live' ? 'badge live' : 'badge';
-                const freeIcon = item.isFree ? '▣' : '□';
-
-                // TD 순서와 TH 순서를 엄격히 일치시킴
-                tr.innerHTML = `
-                    <td style="color: #00ff41; font-weight: 500;">${item.title}</td>
-                    <td>${item.date}</td>
-                    <td><span class="${statusClass}">${item.status}</span></td>
-                    <td>${item.sender}</td>
-                    <td>${item.receiver}</td>
-                    <td>${freeIcon}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('data-table').style.display = 'table';
-        }
-        fetchNotionData();
-    </script>
 </body>
 </html>
