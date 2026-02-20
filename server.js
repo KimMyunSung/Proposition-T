@@ -70,43 +70,26 @@ app.get('/', (req, res) => {
         // 상세 페이지 라우터 (반드시 app.listen 보다 위에 위치해야 합니다)
 app.get('/post/:id', async (req, res) => {
     const pageId = req.params.id;
-
     try {
         const page = await notion.pages.retrieve({ page_id: pageId });
+        const props = page.properties;
         
 // server.js 상세 페이지 라우터 내부
 // 기존의 const title = ... 부분을 아래 코드로 덮어쓰기
-const title = page.properties['이름']?.title[0]?.plain_text || 
-              page.properties['Name']?.title[0]?.plain_text || 
-              page.properties['제목']?.title[0]?.plain_text || '제목 없음';
+const titleKey = Object.keys(props).find(key => props[key].type === 'title');
+        const title = titleKey && props[titleKey].title.length > 0 
+            ? props[titleKey].title[0].plain_text 
+            : '제목 없음';
 
-const date = page.properties['Date']?.date?.start || 
-             page.properties['날짜']?.date?.start || 'N/A';
-
-const sender = page.properties['Sender']?.rich_text[0]?.plain_text || 
-               page.properties['발신']?.rich_text[0]?.plain_text || 'T';
-
-const receiver = page.properties['Receiver']?.rich_text[0]?.plain_text || 
-                 page.properties['수신']?.rich_text[0]?.plain_text || 'All Agents';
+const date = props['Date']?.date?.start || props['날짜']?.date?.start || '-';
+        const sender = props['Sender']?.rich_text[0]?.plain_text || props['발신']?.rich_text[0]?.plain_text || 'T';
+        const receiver = props['Receiver']?.rich_text[0]?.plain_text || props['수신']?.rich_text[0]?.plain_text || 'All Agents';
 
         const mdblocks = await n2m.pageToMarkdown(pageId);
         const mdString = n2m.toMarkdownString(mdblocks);
-        
-        const rawMarkdown = mdString.parent || mdString; 
-        const htmlContent = marked.parse(rawMarkdown);
+        const htmlContent = marked.parse(mdString.parent || mdString);
 
-        const postData = {
-            id: pageId,
-            title: title,
-            date: date,
-            sender: sender,
-            receiver: receiver,
-            content: htmlContent 
-        };
-
-        // views 폴더의 post.ejs 파일에 postData를 얹어서 화면에 보냄
-        res.render('post', { post: postData });
-
+        res.render('post', { post: { id: pageId, title, date, sender, receiver, content: htmlContent } });
     } catch (error) {
         console.error('상세 페이지 로드 오류:', error);
         res.status(500).send("에러가 발생했습니다.");
