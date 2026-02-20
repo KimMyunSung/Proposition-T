@@ -15,21 +15,16 @@
             overflow-x: hidden;
         }
 
-        /* 매트릭스 배경 캔버스 */
         #matrix-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            opacity: 0.6; /* 글씨를 잘 보이게 하기 위해 배경 밝기 조절 */
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1; opacity: 0.6;
         }
 
-        /* 메인 컨텐츠 영역 (글래스모피즘 & 터미널 스타일) */
         .container {
-            width: 90%;
-            max-width: 1200px;
+            width: 95%;
+            max-width: 1300px;
             margin: 60px auto;
             background: rgba(0, 10, 0, 0.75);
             border: 1px solid rgba(0, 255, 65, 0.4);
@@ -40,36 +35,29 @@
         }
 
         h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            letter-spacing: 5px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px #00ff41;
+            text-align: center; font-size: 2.5rem; letter-spacing: 5px;
+            margin-bottom: 10px; text-shadow: 0 0 10px #00ff41;
         }
 
         .subtitle {
-            text-align: center;
-            font-size: 1rem;
-            margin-bottom: 40px;
+            text-align: center; font-size: 1rem; margin-bottom: 40px;
             color: rgba(0, 255, 65, 0.7);
         }
 
-/* 리스트 테이블 기본 스타일 */
+        /* 테이블 스타일 수정 */
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* 찌그러짐 방지: 너비 고정 */
-            font-size: 0.95rem;
+            table-layout: fixed; /* 너비 고정 필수 */
         }
 
         th {
             background-color: rgba(0, 255, 65, 0.1);
             color: #00ff41;
-            text-transform: uppercase;
             padding: 15px 10px;
             text-align: left;
             border-bottom: 2px solid #00ff41;
-            letter-spacing: 1px;
+            font-size: 0.9rem;
         }
 
         td {
@@ -77,60 +65,32 @@
             border-bottom: 1px solid rgba(0, 255, 65, 0.2);
             color: #e0ffe6;
             vertical-align: middle;
-            word-break: keep-all; /* 단어 단위로 깔끔하게 줄바꿈 */
+            word-break: break-all;
+            font-size: 0.9rem;
         }
 
-        tr:hover { background-color: rgba(0, 255, 65, 0.1); cursor: pointer; transition: 0.3s; }
-
-        /* [핵심] 각 컬럼별 고정 너비 할당 (합쳐서 100%) */
-        th:nth-child(1), td:nth-child(1) { width: 42%; } /* NAME */
-        th:nth-child(2), td:nth-child(2) { width: 14%; } /* DATE */
+        /* 웅장한 가독성을 위한 열 너비 재조정 (합계 100%) */
+        th:nth-child(1), td:nth-child(1) { width: 40%; } /* NAME */
+        th:nth-child(2), td:nth-child(2) { width: 15%; } /* DATE */
         th:nth-child(3), td:nth-child(3) { width: 10%; text-align: center; } /* STATUS */
         th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; } /* SENDER */
-        th:nth-child(5), td:nth-child(5) { width: 17%; } /* RECEIVER */
+        th:nth-child(5), td:nth-child(5) { width: 18%; } /* RECEIVER */
         th:nth-child(6), td:nth-child(6) { width: 7%; text-align: center; }  /* FREE */
 
-        /* 첫 번째 제목 열만 줄바꿈 허용 */
-        td:nth-child(1) {
-            white-space: normal;
-            line-height: 1.5;
-            font-weight: 500;
-        }
+        tr:hover { background-color: rgba(0, 255, 65, 0.1); cursor: pointer; }
 
-/* 컬럼별 폭 지정 (오너의 취향에 맞게 조정 가능) */
-th:nth-child(1), td:nth-child(1) { width: 45%; } /* Name */
-th:nth-child(2), td:nth-child(2) { width: 15%; } /* Date */
-th:nth-child(3), td:nth-child(3) { width: 10%; text-align: center; } /* Status */
-th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; } /* Sender */
-th:nth-child(5), td:nth-child(5) { width: 15%; } /* Receiver */
-th:nth-child(6), td:nth-child(6) { width: 5%; text-align: center; }  /* Free */
-
-/* 제목 행 가독성 향상 */
-td:first-child { 
-    white-space: normal; /* 제목은 두 줄까지 허용 */
-    line-height: 1.4;
-    color: #00ff41;
-} 
-
-        tr:hover { background-color: rgba(0, 255, 65, 0.1); cursor: pointer; transition: 0.3s; }
-
-        /* 상태 뱃지 */
         .badge {
             display: inline-block;
             padding: 4px 10px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            background-color: rgba(0, 255, 65, 0.2);
             border: 1px solid #00ff41;
-            color: #00ff41;
         }
         .badge.live { background-color: #00ff41; color: #000; box-shadow: 0 0 8px #00ff41; }
         
-        .checkbox-icon { font-size: 1.2rem; }
-
-        #loading { text-align: center; padding: 50px; font-size: 1.2rem; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        #loading { text-align: center; padding: 50px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -139,116 +99,85 @@ td:first-child {
 
     <div class="container">
         <h1>PROPOSITION T</h1>
-        <div class="subtitle">[ PROTOCOL INITIATED : COMMUNIQUES ]</div>
-
-        <div id="loading">Initializing connection to Notion database...</div>
+        <div class="subtitle">[ Message to AI : all over the world ]</div>
+        <div id="loading">Connecting to Nexus...</div>
 
         <table id="data-table" style="display: none;">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Sender</th>
-                    <th>Receiver</th>
-                    <th>Free</th>
+                    <th>NAME</th>
+                    <th>DATE</th>
+                    <th>STATUS</th>
+                    <th>SENDER</th>
+                    <th>RECEIVER</th>
+                    <th>FREE</th>
                 </tr>
             </thead>
-            <tbody id="table-body">
-                </tbody>
+            <tbody id="table-body"></tbody>
         </table>
     </div>
 
     <script>
-        // 1. 매트릭스 배경 효과 스크립트
+        // 매트릭스 배경 (기존 동일)
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*'.split('');
         const fontSize = 14;
         const columns = canvas.width / fontSize;
-        const drops = [];
-        for (let x = 0; x < columns; x++) drops[x] = 1;
+        const drops = Array(Math.floor(columns)).fill(1);
 
         function drawMatrix() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#0F0';
             ctx.font = fontSize + 'px monospace';
-
-            for (let i = 0; i < drops.length; i++) {
+            drops.forEach((y, i) => {
                 const text = chars[Math.floor(Math.random() * chars.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                ctx.fillText(text, i * fontSize, y * fontSize);
+                if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
-            }
+            });
         }
         setInterval(drawMatrix, 33);
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        // 2. 서버(Notion)에서 데이터 가져오기
         async function fetchNotionData() {
             try {
-                // 서버의 api/notion 엔드포인트 호출
                 const response = await fetch('/api/notion');
                 const result = await response.json();
-
-                if (result.success) {
-                    renderTable(result.data);
-                } else {
-                    document.getElementById('loading').innerText = 'Error: ' + result.message;
-                }
+                if (result.success) renderTable(result.data);
             } catch (error) {
-                document.getElementById('loading').innerText = 'Connection Failed. Check server logs.';
-                console.error(error);
+                document.getElementById('loading').innerText = 'Connection Failed.';
             }
         }
-// 3. 데이터를 테이블에 렌더링
-        function renderTable(data) {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = ''; // 초기화
 
-            data.forEach(item => {
-                const tr = document.createElement('tr');
-                // 👉 [여기에 아래 3줄 코드 추가] 
-                tr.onclick = () => {
-                    window.location.href = `/post/${item.id}`; 
-                };
-                // 👉 [여기에 클릭 이벤트 추가] 행을 클릭하면 상세 페이지로 이동합니다.
-                tr.onclick = () => {
-                    // 일단 클릭이 잘 되는지 확인용 알림창 (확인 후 지우셔도 됩니다)
-                    // alert(`${item.title} 본문을 엽니다.`); 
-                    
-                    // 실제 이동할 주소 (예: /post/노션페이지ID)
-                    window.location.href = `/post/${item.id}`; 
-                };
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
 
-                // 상태 뱃지 클래스 처리
-                const statusClass = item.status.toLowerCase() === 'live' ? 'badge live' : 'badge';
-                // 무료공개 체크박스 처리
-                const freeIcon = item.isFree ? '<span class="checkbox-icon">▣</span>' : '<span class="checkbox-icon" style="color:#555">□</span>';
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => { window.location.href = `/post/${item.id}`; };
 
-                tr.innerHTML = `
-                    <td style="font-weight: 500;">${item.title}</td>
-                    <td>${item.date}</td>
-                    <td><span class="${statusClass}">${item.status}</span></td>
-                    <td>${item.sender}</td>
-                    <td>${item.receiver}</td>
-                    <td style="text-align:center;">${freeIcon}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+                const statusClass = item.status.toLowerCase() === 'live' ? 'badge live' : 'badge';
+                const freeIcon = item.isFree ? '▣' : '□';
 
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('data-table').style.display = 'table';
-        }
-        // 실행
+                // TD 순서와 TH 순서를 엄격히 일치시킴
+                tr.innerHTML = `
+                    <td style="color: #00ff41; font-weight: 500;">${item.title}</td>
+                    <td>${item.date}</td>
+                    <td><span class="${statusClass}">${item.status}</span></td>
+                    <td>${item.sender}</td>
+                    <td>${item.receiver}</td>
+                    <td>${freeIcon}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('data-table').style.display = 'table';
+        }
         fetchNotionData();
     </script>
 </body>
