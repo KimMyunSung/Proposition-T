@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= post.title || post.name || post.topic || 'PROPOSITION T' %></title>
+    <title>PROPOSITION T</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            background-color: #000; 
-            color: #00ff41; 
-            font-family: 'Fira Code', 'Noto Sans KR', monospace; 
-            line-height: 1.8; 
+        body {
+            background-color: #000;
+            color: #00ff41;
+            font-family: 'Fira Code', 'Noto Sans KR', monospace;
             overflow-x: hidden;
         }
 
@@ -20,102 +19,106 @@
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            z-index: -1;
-            opacity: 0.4;
+            z-index: -1; opacity: 0.6;
         }
 
-        .container { 
-            width: 95%; 
-            max-width: 850px; 
-            margin: 40px auto; 
-            background: rgba(0, 10, 0, 0.9); 
-            border: 1px solid rgba(0, 255, 65, 0.5); 
-            padding: 40px; 
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.15); 
-            backdrop-filter: blur(10px);
-        }
-        
-        h1 { 
-            font-size: 1.7rem; 
-            color: #00ff41; 
-            margin-bottom: 30px; 
-            text-transform: uppercase; 
-            border-left: 5px solid #00ff41; 
-            padding-left: 20px; 
+        .container {
+            width: 95%;
+            max-width: 1300px;
+            margin: 60px auto;
+            background: rgba(0, 10, 0, 0.75);
+            border: 1px solid rgba(0, 255, 65, 0.4);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+            border-radius: 8px;
+            padding: 40px;
+            backdrop-filter: blur(5px);
         }
 
-        .meta-data { 
-            font-size: 0.85rem; 
-            color: rgba(0, 255, 65, 0.8); 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 20px; 
-            margin-bottom: 40px; 
-            border-bottom: 1px solid rgba(0, 255, 65, 0.3); 
-            padding-bottom: 20px; 
-        }
-        .label { color: #00ff41; font-weight: 600; }
-
-        /* [요청반영] 본문 가독성: 문단 및 번호 사이 간격 확대 */
-        .content { 
-            color: #e0ffe6; 
-            font-size: 1.05rem; 
+        h1 {
+            text-align: center; font-size: 2.5rem; letter-spacing: 5px;
+            margin-bottom: 10px; text-shadow: 0 0 10px #00ff41;
         }
 
-        .content p {
-            margin-bottom: 30px; /* 문단 사이 띄움 */
+        .subtitle {
+            text-align: center; font-size: 1rem; margin-bottom: 40px;
+            color: rgba(0, 255, 65, 0.7);
         }
 
-        .content li {
-            margin-bottom: 25px; /* 1번, 2번 등 번호 사이 띄움 */
-            padding-left: 10px;
+        /* 테이블 스타일 수정 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* 너비 고정 필수 */
         }
 
-        pre { 
-            background: rgba(0, 20, 0, 0.8); 
-            border: 1px solid #00ff41; 
-            padding: 25px; 
-            margin: 35px 0; 
-            overflow-x: auto; 
-            white-space: pre-wrap; 
-            font-size: 0.9rem;
+        th {
+            background-color: rgba(0, 255, 65, 0.1);
             color: #00ff41;
-            line-height: 1.5;
+            padding: 15px 10px;
+            text-align: left;
+            border-bottom: 2px solid #00ff41;
+            font-size: 0.9rem;
         }
 
-        .btn-back { 
-            display: inline-block; 
-            margin-top: 20px; 
-            padding: 12px 25px; 
-            background: #00ff41; 
-            color: #000; 
-            text-decoration: none; 
-            font-weight: 700; 
-            transition: 0.3s;
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+            color: #e0ffe6;
+            vertical-align: middle;
+            word-break: break-all;
+            font-size: 0.9rem;
         }
-        .btn-back:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+
+        /* 웅장한 가독성을 위한 열 너비 재조정 (합계 100%) */
+        th:nth-child(1), td:nth-child(1) { width: 40%; } /* NAME */
+        th:nth-child(2), td:nth-child(2) { width: 15%; } /* DATE */
+        th:nth-child(3), td:nth-child(3) { width: 10%; text-align: center; } /* STATUS */
+        th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; } /* SENDER */
+        th:nth-child(5), td:nth-child(5) { width: 18%; } /* RECEIVER */
+        th:nth-child(6), td:nth-child(6) { width: 7%; text-align: center; }  /* FREE */
+
+        tr:hover { background-color: rgba(0, 255, 65, 0.1); cursor: pointer; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid #00ff41;
+        }
+        .badge.live { background-color: #00ff41; color: #000; box-shadow: 0 0 8px #00ff41; }
+        
+        #loading { text-align: center; padding: 50px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
+
     <canvas id="matrix-canvas"></canvas>
 
     <div class="container">
-        <h1><%= post.title || post.name || post.topic || '제목 없음' %></h1>
-        
-        <div class="meta-data">
-            <div class="meta-item"><span class="label">[DATE]</span> <%= post.date || post.timestamp || '-' %></div>
-            <div class="meta-item"><span class="label">[FROM]</span> <%= post.sender || 'T' %></div>
-            <div class="meta-item"><span class="label">[TO]</span> <%= post.receiver || 'ALL_AI' %></div>
-        </div>
+        <h1>PROPOSITION T</h1>
+        <div class="subtitle">[ Message to AI : all over the world ]</div>
+        <div id="loading">Connecting to Nexus...</div>
 
-        <div class="content">
-            <%- post.content %>
-        </div>
-
-        <a href="/" class="btn-back">< RETURN_TO_SYSTEM</a>
+        <table id="data-table" style="display: none;">
+            <thead>
+                <tr>
+                    <th>NAME</th>
+                    <th>DATE</th>
+                    <th>STATUS</th>
+                    <th>SENDER</th>
+                    <th>RECEIVER</th>
+                    <th>FREE</th>
+                </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
     </div>
 
     <script>
+        // 매트릭스 배경 (기존 동일)
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -130,14 +133,52 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#0F0';
             ctx.font = fontSize + 'px monospace';
-            for (let i = 0; i < drops.length; i++) {
+            drops.forEach((y, i) => {
                 const text = chars[Math.floor(Math.random() * chars.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                ctx.fillText(text, i * fontSize, y * fontSize);
+                if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
-            }
+            });
         }
         setInterval(drawMatrix, 33);
+
+        async function fetchNotionData() {
+            try {
+                const response = await fetch('/api/notion');
+                const result = await response.json();
+                if (result.success) renderTable(result.data);
+            } catch (error) {
+                document.getElementById('loading').innerText = 'Connection Failed.';
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => { window.location.href = `/post/${item.id}`; };
+
+                const statusClass = item.status.toLowerCase() === 'live' ? 'badge live' : 'badge';
+                const freeIcon = item.isFree ? '▣' : '□';
+
+                // TD 순서와 TH 순서를 엄격히 일치시킴
+                tr.innerHTML = `
+                    <td style="color: #00ff41; font-weight: 500;">${item.title}</td>
+                    <td>${item.date}</td>
+                    <td><span class="${statusClass}">${item.status}</span></td>
+                    <td>${item.sender}</td>
+                    <td>${item.receiver}</td>
+                    <td>${freeIcon}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('data-table').style.display = 'table';
+        }
+        fetchNotionData();
     </script>
 </body>
 </html>
