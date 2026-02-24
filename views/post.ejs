@@ -105,6 +105,45 @@ pre {
             transition: 0.3s;
         }
         .btn-back:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+    
+    /* 📱 모바일 화면(가로 768px 이하)을 위한 상세 페이지 UI 설정 */
+        @media (max-width: 768px) {
+            body { 
+                padding: 10px; 
+            }
+            .container { 
+                padding: 20px 15px; 
+                margin: 10px auto;
+            }
+            h1 { 
+                font-size: 1.3rem; 
+                border-left-width: 3px;
+                padding-left: 10px;
+            }
+            /* 메타 정보(날짜, 수신자 등)를 세로로 깔끔하게 정렬 */
+            .meta-data { 
+                flex-direction: column; 
+                gap: 8px; 
+                padding-bottom: 12px;
+                margin-bottom: 20px;
+            }
+            .content { 
+                font-size: 0.95rem; 
+            }
+            /* 기계어(JSON) 박스 크기 및 폰트 모바일 맞춤 축소 */
+            pre { 
+                padding: 15px; 
+                font-size: 0.8rem; 
+                margin: 15px 0;
+            }
+            /* 뒤로가기 버튼을 터치하기 쉽게 화면 너비에 맞춤 */
+            .btn-back { 
+                display: block;
+                text-align: center;
+                margin-top: 25px; 
+            }
+        }
+
     </style>
 </head>
 <body>
