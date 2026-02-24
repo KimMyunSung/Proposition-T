@@ -92,52 +92,65 @@
         #loading { text-align: center; padding: 50px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        /* 📱 모바일 화면(가로 768px 이하)을 위한 반응형 터미널 UI 설정 */
+       /* 📱 모바일 화면(가로 768px 이하)을 위한 2차 개선안: 콤팩트 & 클린 */
         @media (max-width: 768px) {
-            /* 1. 테이블 헤더(분류명) 숨기기 */
+            /* 1. 테이블 헤더 숨기기 (동일) */
             thead { display: none; }
             
-            /* 2. 표의 뼈대를 해체하고 블록(상자) 형태로 변환 */
+            /* 2. 표 구조 해체 (동일) */
             table, tbody, tr, td {
                 display: block;
                 width: 100%;
+                border: none; /* 기존 테두리 제거 */
             }
 
-            /* 3. 각 메시지를 하나의 독립된 '터미널 카드'처럼 디자인 */
+            /* 3. 각 메시지 행 디자인: 박스 대신 깔끔한 구분선 사용 */
             tr {
-                margin-bottom: 20px;
-                border: 1px solid rgba(0, 255, 65, 0.4);
-                border-radius: 8px;
-                padding: 15px;
-                background: rgba(0, 20, 0, 0.7); /* 살짝 어두운 배경 */
-                box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+                padding: 15px 5px;
+                border-bottom: 1px dashed rgba(0, 255, 65, 0.3); /* 점선으로 은은하게 구분 */
+                background: transparent; /* 배경색 제거 */
+                box-shadow: none; /* 그림자 제거 */
             }
 
-            /* 4. 칸(td) 나누기 선 스타일 */
+            /* 4. 셀 기본 스타일 초기화 */
             td {
-                padding: 8px 0;
-                border-bottom: 1px dashed rgba(0, 255, 65, 0.2);
+                padding: 2px 0;
                 text-align: left !important;
             }
-            td:last-child { border-bottom: none; }
 
-            /* 5. [핵심] 제목은 크고 눈에 띄게! */
+            /* 5. [핵심] 제목: 가장 크고 중요하게 배치 */
             td:nth-child(1) {
-                font-size: 1.15rem;
-                font-weight: 700;
+                font-size: 1.2rem;
+                font-weight: 600;
                 color: #00ff41;
-                border-bottom: 1px solid #00ff41;
-                padding-bottom: 12px;
-                margin-bottom: 10px;
-                line-height: 1.4;
+                margin-bottom: 8px;
+                line-height: 1.3;
             }
 
-            /* 6. 내용 앞에 친절하게 라벨([DATE], [FROM] 등) 달아주기 */
-            td:nth-child(2)::before { content: "[DATE] "; color: rgba(0, 255, 65, 0.5); font-weight: bold; }
-            td:nth-child(3)::before { content: "[STATUS] "; color: rgba(0, 255, 65, 0.5); font-weight: bold; }
-            td:nth-child(4)::before { content: "[FROM] "; color: rgba(0, 255, 65, 0.5); font-weight: bold; }
-            td:nth-child(5)::before { content: "[TO] "; color: rgba(0, 255, 65, 0.5); font-weight: bold; }
-            td:nth-child(6)::before { content: "[FREE] "; color: rgba(0, 255, 65, 0.5); font-weight: bold; }
+            /* 6. [핵심] 부가 정보(날짜, 상태, 발신자): 한 줄로 작게 모아서 표시 */
+            /* 모바일에서 덜 중요한 수신자(5번), 무료여부(6번)는 과감히 숨김 */
+            td:nth-child(5), td:nth-child(6) { display: none; }
+
+            /* 날짜, 상태, 발신자를 한 줄에 나란히 배치 */
+            td:nth-child(2), td:nth-child(3), td:nth-child(4) {
+                display: inline-block; /* 옆으로 나란히 */
+                font-size: 0.8rem;
+                color: rgba(0, 255, 65, 0.7); /* 약간 어둡게 처리 */
+                margin-right: 5px;
+            }
+
+            /* 날짜와 발신자 뒤에 구분선(|) 추가 */
+            td:nth-child(2)::after { content: " | "; opacity: 0.5; }
+            
+            /* 상태 뱃지(Live) 위치 조정 */
+            td:nth-child(3) { 
+                float: right; /* 오른쪽 끝으로 보냄 */
+                margin-top: -30px; /* 제목 옆으로 위치 조정 */
+            }
+             .badge { padding: 2px 6px; font-size: 0.7rem; } /* 뱃지 크기 축소 */
+
+            /* 이전 코드에 있던 [라벨] 제거 (중요!) */
+            td::before { content: none !important; }
         }
 </style>
         </head>
