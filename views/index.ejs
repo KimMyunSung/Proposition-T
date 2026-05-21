@@ -37,6 +37,10 @@
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- Pi Network SDK -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -76,6 +80,39 @@
         .badge.live { background-color: #00ff41; color: #000; box-shadow: 0 0 8px #00ff41; }
         .empty { text-align: center; padding: 50px; opacity: 0.7; }
 
+        /* === Pi Auth Bar === */
+        #pi-auth-bar {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 1000;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #pi-signin-btn {
+            background: rgba(0, 10, 0, 0.85);
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        #pi-signin-btn:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 12px #00ff41;
+        }
+        #pi-username {
+            color: #00ff41;
+            text-shadow: 0 0 6px rgba(0, 255, 65, 0.6);
+        }
+
         @media (max-width: 768px) {
             thead { display: none; }
             table, tbody, tr, td { display: block; width: 100%; border: none; }
@@ -93,6 +130,12 @@
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
+
+    <!-- Pi Auth Bar -->
+    <div id="pi-auth-bar">
+        <button id="pi-signin-btn" type="button">[ PI_SIGN_IN ]</button>
+        <span id="pi-username"></span>
+    </div>
 
     <div class="container">
         <h1>PROPOSITION T</h1>
@@ -165,6 +208,68 @@
                 if (href) window.location.href = href;
             });
         });
+    </script>
+
+    <!-- Pi Authentication -->
+    <script>
+        (function () {
+            const usernameEl = document.getElementById('pi-username');
+            const btnEl = document.getElementById('pi-signin-btn');
+
+            function showAuthenticated(user) {
+                if (user && user.username) {
+                    usernameEl.textContent = '@' + user.username;
+                    btnEl.style.display = 'none';
+                }
+            }
+
+            function onIncompletePaymentFound(payment) {
+                console.log('Incomplete payment:', payment);
+            }
+
+            async function signIn() {
+                try {
+                    const auth = await Pi.authenticate(['username'], onIncompletePaymentFound);
+                    showAuthenticated(auth && auth.user);
+                    return auth;
+                } catch (err) {
+                    console.error('Pi authenticate error:', err);
+                    throw err;
+                }
+            }
+
+            async function initAndAuth() {
+                if (typeof Pi === 'undefined') {
+                    console.warn('Pi SDK not available (not running in Pi Browser).');
+                    return;
+                }
+                try {
+                    await Promise.resolve(Pi.init({ version: '2.0', sandbox: false }));
+                    await signIn();
+                } catch (err) {
+                    console.error('Pi init/auth error:', err);
+                }
+            }
+
+            btnEl.addEventListener('click', async () => {
+                try {
+                    if (typeof Pi === 'undefined') {
+                        alert('Pi SDK not available. Open this site in Pi Browser.');
+                        return;
+                    }
+                    await Promise.resolve(Pi.init({ version: '2.0', sandbox: false }));
+                    await signIn();
+                } catch (err) {
+                    alert('Pi Sign-In Failed: ' + (err && err.message ? err.message : err));
+                }
+            });
+
+            if (document.readyState === 'complete') {
+                initAndAuth();
+            } else {
+                window.addEventListener('load', initAndAuth);
+            }
+        })();
     </script>
 </body>
 </html>
