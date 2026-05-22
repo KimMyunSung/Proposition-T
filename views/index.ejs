@@ -79,7 +79,41 @@
         .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; border: 1px solid #00ff41; }
         .badge.live { background-color: #00ff41; color: #000; box-shadow: 0 0 8px #00ff41; }
         .badge.free { background-color: rgba(0, 255, 65, 0.15); color: #00ff41; }
-        .badge.paid { background-color: transparent; color: rgba(0, 255, 65, 0.55); border-color: rgba(0, 255, 65, 0.45); }
+        .badge.paid {
+            background-color: rgba(178, 102, 255, 0.18);
+            color: #d9b3ff;
+            border-color: #b266ff;
+            text-shadow: 0 0 6px rgba(178, 102, 255, 0.9);
+            box-shadow: 0 0 10px rgba(178, 102, 255, 0.55), inset 0 0 8px rgba(178, 102, 255, 0.25);
+        }
+        .sender-t {
+            display: inline-block;
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: 1px;
+            color: #00ff41;
+            text-shadow:
+                0 0 4px #00ff41,
+                0 0 10px rgba(0, 255, 65, 0.75),
+                0 0 18px rgba(0, 255, 65, 0.45);
+            padding: 2px 10px;
+            border: 1px solid rgba(0, 255, 65, 0.6);
+            border-radius: 4px;
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.08), rgba(0, 255, 65, 0.02));
+            position: relative;
+        }
+        .sender-t::before,
+        .sender-t::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 10px;
+            height: 1px;
+            background: rgba(0, 255, 65, 0.55);
+        }
+        .sender-t::before { left: -14px; }
+        .sender-t::after  { right: -14px; }
         .empty { text-align: center; padding: 50px; opacity: 0.7; }
 
         /* === Pi Auth Bar === */
@@ -173,7 +207,7 @@
                             </a>
                         </td>
                         <td><%= item.date %></td>
-                        <td><%= item.sender %></td>
+                        <td><span class="sender-t"><%= item.sender %></span></td>
                         <td><%= item.receiver %></td>
                         <td><span class="<%= priceClass %>"><%= priceLabel %></span></td>
                     </tr>
