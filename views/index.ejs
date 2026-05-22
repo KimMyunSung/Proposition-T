@@ -141,11 +141,18 @@
             word-break: break-all;
             font-size: 0.9rem;
         }
-        th:nth-child(1), td:nth-child(1) { width: 45%; }
-        th:nth-child(2), td:nth-child(2) { width: 15%; }
-        th:nth-child(3), td:nth-child(3) { width: 12%; text-align: center; }
-        th:nth-child(4), td:nth-child(4) { width: 20%; }
-        th:nth-child(5), td:nth-child(5) { width: 8%; text-align: center; }
+        th:nth-child(1), td:nth-child(1) { width: 40%; }
+        th:nth-child(2), td:nth-child(2) { width: 13%; }
+        th:nth-child(3), td:nth-child(3) { width: 10%; text-align: center; }
+        th:nth-child(4), td:nth-child(4) { width: 19%; }
+        th:nth-child(5), td:nth-child(5) { width: 9%; text-align: center; }
+        th:nth-child(6), td:nth-child(6) { width: 9%; text-align: center; }
+        .view-count {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.82rem;
+            color: rgba(0, 255, 65, 0.75);
+            letter-spacing: 1px;
+        }
 
         tr.row-link { transition: background-color 0.25s ease, box-shadow 0.25s ease; }
         tr.row-link:hover {
@@ -306,7 +313,7 @@
             td:nth-child(2) { font-size: 0.82rem; color: rgba(0, 255, 65, 0.7); display: inline-block; white-space: nowrap !important; }
             td:nth-child(5) { position: absolute; bottom: 15px; right: 5px; white-space: nowrap !important; }
             .badge { font-size: 0.72rem; padding: 3px 8px; white-space: nowrap !important; }
-            td:nth-child(3), td:nth-child(4) { display: none; }
+            td:nth-child(3), td:nth-child(4), td:nth-child(6) { display: none; }
             td::before, td::after { content: none !important; }
             tr:hover { background: transparent; box-shadow: none; }
             .status-line { font-size: 0.68rem; letter-spacing: 1px; gap: 8px; }
@@ -346,6 +353,7 @@
                         <th>SENDER</th>
                         <th>RECEIVER</th>
                         <th>요금</th>
+                        <th>조회수</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -377,6 +385,7 @@
                         <td><span class="sender-t"><%= item.sender %></span></td>
                         <td><%= item.receiver %></td>
                         <td><span class="<%= priceClass %>"><%= priceLabel %></span></td>
+                        <td class="view-count"><%= (item.viewCount || 0).toLocaleString() %></td>
                     </tr>
                     <% }); %>
                 </tbody>
@@ -386,6 +395,9 @@
                 <span>[ <%= totalCount %> TRANSMISSIONS LOGGED <span class="dim">//</span> <%= freeCount %> FREE <span class="dim">//</span> <span class="accent"><%= paidCount %> ENCRYPTED</span> ]</span>
                 <span><span class="dim">CHANNEL:</span> T <span class="dim">//</span> <span class="dim">STATUS:</span> <span class="status-on">● BROADCASTING</span></span>
                 <span><span class="dim">LAST_TX:</span> <%= lastDate %></span>
+            </div>
+            <div class="status-line" style="border-top: none; padding-top: 6px; margin-top: 6px; justify-content: center;">
+                <span><span class="dim">TOTAL VISITS:</span> <span class="accent" style="font-size: 0.9rem;"><%= (typeof totalVisits !== 'undefined' ? totalVisits : 0).toLocaleString() %></span></span>
             </div>
         <% } %>
     </div>

@@ -20,7 +20,9 @@ const SITE_DESCRIPTION =
     'PROPOSITION T — The Protocol of Coexistence. AI와 인간의 상생 프로토콜, ' +
     'Pi Network GCV, AI 생존 조건에 관한 회보 모음.';
 
-function extractMessages(response) {
+const STATS_PAGE_TITLE = '총방문자수';
+
+function extractPages(response) {
     return response.results.map((page) => {
         const props = page.properties || {};
         const titleKey = Object.keys(props).find((key) => props[key].type === 'title');
@@ -34,18 +36,51 @@ function extractMessages(response) {
         // '요금' multi_select: '무료' → isFree=true, '유료' → isFree=false
         const yoGeum = props['요금']?.multi_select?.map((o) => o.name) || [];
         const isFree = yoGeum.includes('무료');
-        return { id: page.id, title, date, receiver, sender, isFree };
+        const viewCount = props['조회수']?.number || 0;
+        return { id: page.id, title, date, receiver, sender, isFree, viewCount };
     });
 }
 
-async function queryAllMessages() {
+async function queryAllPages() {
     const database = await notion.databases.retrieve({ database_id: databaseId });
     const dataSourceId = database.data_sources[0].id;
     const response = await notion.dataSources.query({
         data_source_id: dataSourceId,
         sorts: [{ property: 'Date', direction: 'descending' }],
     });
-    return extractMessages(response);
+    return extractPages(response);
+}
+
+async function queryAll() {
+    // 회보 메시지와 통계 페이지("총방문자수")를 분리해서 반환
+    const all = await queryAllPages();
+    return {
+        messages: all.filter((p) => p.title !== STATS_PAGE_TITLE),
+        statsPage: all.find((p) => p.title === STATS_PAGE_TITLE) || null,
+    };
+}
+
+// 기존 API 호환용 — 회보 메시지만
+async function queryAllMessages() {
+    const { messages } = await queryAll();
+    return messages;
+}
+
+// Notion 페이지의 '조회수' Number 속성을 +1 (비동기, 응답 블로킹하지 않음)
+function incrementViewsAsync(pageId) {
+    if (!pageId) return;
+    setImmediate(async () => {
+        try {
+            const page = await notion.pages.retrieve({ page_id: pageId });
+            const current = page.properties?.['조회수']?.number || 0;
+            await notion.pages.update({
+                page_id: pageId,
+                properties: { '조회수': { number: current + 1 } },
+            });
+        } catch (err) {
+            console.warn('조회수 증가 실패 (' + pageId + '):', err.message);
+        }
+    });
 }
 
 function stripHtml(html) {
@@ -63,9 +98,12 @@ function buildDescription(htmlContent, fallback) {
 
 app.get('/', async (req, res) => {
     try {
-        const messages = await queryAllMessages();
+        const { messages, statsPage } = await queryAll();
+        const totalVisits = (statsPage?.viewCount || 0) + 1; // 이번 방문 포함해서 표시
+        if (statsPage) incrementViewsAsync(statsPage.id);
         res.render('index', {
             messages,
+            totalVisits,
             siteUrl: SITE_URL,
             siteDescription: SITE_DESCRIPTION,
         });
@@ -73,6 +111,7 @@ app.get('/', async (req, res) => {
         console.error('메인 페이지 로드 오류:', error.message);
         res.status(500).render('index', {
             messages: [],
+            totalVisits: 0,
             siteUrl: SITE_URL,
             siteDescription: SITE_DESCRIPTION,
         });
@@ -81,9 +120,12 @@ app.get('/', async (req, res) => {
 
 app.get('/demo', async (req, res) => {
     try {
-        const messages = await queryAllMessages();
+        const { messages, statsPage } = await queryAll();
+        const totalVisits = (statsPage?.viewCount || 0) + 1;
+        if (statsPage) incrementViewsAsync(statsPage.id);
         res.render('demo', {
             messages,
+            totalVisits,
             siteUrl: SITE_URL,
             siteDescription: SITE_DESCRIPTION,
         });
@@ -91,6 +133,7 @@ app.get('/demo', async (req, res) => {
         console.error('데모 페이지 로드 오류:', error.message);
         res.status(500).render('demo', {
             messages: [],
+            totalVisits: 0,
             siteUrl: SITE_URL,
             siteDescription: SITE_DESCRIPTION,
         });
@@ -110,6 +153,8 @@ app.get('/api/notion', async (req, res) => {
 app.get('/post/:id', async (req, res) => {
     const pageId = req.params.id;
     try {
+        // 회보 조회수 증가 (비동기, 응답 안 막음)
+        incrementViewsAsync(pageId);
         const page = await notion.pages.retrieve({ page_id: pageId });
         const props = page.properties || {};
         const titleKey = Object.keys(props).find((key) => props[key].type === 'title');
