@@ -67,12 +67,11 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background-color: rgba(0, 255, 65, 0.1); color: #00ff41; padding: 15px 10px; text-align: left; border-bottom: 2px solid #00ff41; font-size: 0.9rem; }
         td { padding: 15px 10px; border-bottom: 1px solid rgba(0, 255, 65, 0.2); color: #e0ffe6; vertical-align: middle; word-break: break-all; font-size: 0.9rem; }
-        th:nth-child(1), td:nth-child(1) { width: 40%; }
+        th:nth-child(1), td:nth-child(1) { width: 45%; }
         th:nth-child(2), td:nth-child(2) { width: 15%; }
-        th:nth-child(3), td:nth-child(3) { width: 10%; text-align: center; }
-        th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; }
-        th:nth-child(5), td:nth-child(5) { width: 18%; }
-        th:nth-child(6), td:nth-child(6) { width: 7%; text-align: center; }
+        th:nth-child(3), td:nth-child(3) { width: 12%; text-align: center; }
+        th:nth-child(4), td:nth-child(4) { width: 20%; }
+        th:nth-child(5), td:nth-child(5) { width: 8%; text-align: center; }
         tr.row-link:hover { background-color: rgba(0, 255, 65, 0.1); cursor: pointer; }
         td a.title-link { color: #00ff41; font-weight: 500; text-decoration: none; }
         td a.title-link:hover { text-shadow: 0 0 6px #00ff41; }
@@ -120,9 +119,9 @@
             td { padding: 0; text-align: left !important; border: none !important; }
             td:nth-child(1) { font-size: 1.25rem; font-weight: 700; color: #00ff41; margin-bottom: 15px; line-height: 1.3; display: block; width: 100%; word-break: keep-all; }
             td:nth-child(2) { font-size: 0.85rem; color: rgba(0, 255, 65, 0.7); display: inline-block; white-space: nowrap !important; }
-            td:nth-child(3) { position: absolute; bottom: 15px; right: 5px; white-space: nowrap !important; }
+            td:nth-child(5) { position: absolute; bottom: 15px; right: 5px; white-space: nowrap !important; font-size: 1.1rem; }
             .badge { font-size: 0.75rem; padding: 3px 8px; white-space: nowrap !important; }
-            td:nth-child(4), td:nth-child(5), td:nth-child(6) { display: none; }
+            td:nth-child(3), td:nth-child(4) { display: none; }
             td::before, td::after { content: none !important; }
             tr:hover { background: transparent; }
         }
@@ -149,7 +148,6 @@
                     <tr>
                         <th>NAME</th>
                         <th>DATE</th>
-                        <th>STATUS</th>
                         <th>SENDER</th>
                         <th>RECEIVER</th>
                         <th>FREE</th>
@@ -157,13 +155,11 @@
                 </thead>
                 <tbody>
                     <% messages.forEach(function(item){
-                        var statusClass = (item.status || '').toLowerCase() === 'live' ? 'badge live' : 'badge';
                         var freeIcon = item.isFree ? '▣' : '□';
                     %>
                     <tr class="row-link" data-href="/post/<%= item.id %>">
                         <td><a class="title-link" href="/post/<%= item.id %>"><%= item.title %></a></td>
                         <td><%= item.date %></td>
-                        <td><span class="<%= statusClass %>"><%= item.status %></span></td>
                         <td><%= item.sender %></td>
                         <td><%= item.receiver %></td>
                         <td><%= freeIcon %></td>

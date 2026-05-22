@@ -29,13 +29,12 @@ function extractMessages(response) {
                 ? props[titleKey].title[0].plain_text
                 : '제목 없음';
         const date = props['Date']?.date?.start || '-';
-        const status = props['Status']?.select?.name || '-';
         const receiver = props['수신']?.rich_text?.[0]?.plain_text || '-';
         const sender = props['발신']?.rich_text?.[0]?.plain_text || '-';
         // '요금' multi_select: '무료' → isFree=true, '유료' → isFree=false
         const yoGeum = props['요금']?.multi_select?.map((o) => o.name) || [];
         const isFree = yoGeum.includes('무료');
-        return { id: page.id, title, date, status, receiver, sender, isFree };
+        return { id: page.id, title, date, receiver, sender, isFree };
     });
 }
 
