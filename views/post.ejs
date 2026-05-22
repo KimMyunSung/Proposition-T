@@ -137,42 +137,37 @@
         }
         .lang-toggle .arrow { opacity: 0.6; }
 
-        /* === 메타데이터 (칩 스타일) === */
+        /* === 메타데이터 (인라인 — 원래 스타일) === */
         .meta-data {
+            font-size: 0.82rem;
+            color: rgba(0, 255, 65, 0.85);
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 14px;
+            gap: 28px;
             margin-bottom: 50px;
-            padding-bottom: 24px;
-            border-bottom: 1px dashed rgba(0, 255, 65, 0.3);
+            padding-bottom: 22px;
+            border-bottom: 1px dashed rgba(0, 255, 65, 0.35);
         }
-        .meta-item {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 9px 18px 9px 14px;
-            background: linear-gradient(135deg, rgba(0, 255, 65, 0.05), rgba(0, 255, 65, 0.01));
-            border-left: 2px solid var(--accent);
-            border-right: 1px solid rgba(0, 255, 65, 0.18);
-            box-shadow: inset 0 0 8px rgba(0, 255, 65, 0.04);
-            min-width: 100px;
-        }
-        .meta-item .label {
-            font-size: 0.66rem;
-            color: var(--accent);
-            letter-spacing: 2.5px;
+        .label { color: #00ff41; font-weight: 600; margin-right: 4px; }
+
+        /* 메인 페이지와 동일한 발광 T 엠블럼 */
+        .sender-t {
+            display: inline-block;
+            font-family: 'Fira Code', monospace;
             font-weight: 700;
-            margin-bottom: 4px;
-            text-shadow: 0 0 5px var(--accent-faint);
-            font-family: 'Fira Code', monospace;
-        }
-        .meta-item .value {
+            font-size: 1.05rem;
+            letter-spacing: 1px;
             color: #00ff41;
-            font-weight: 500;
-            font-size: 0.9rem;
-            font-family: 'Fira Code', monospace;
-            letter-spacing: 0.5px;
+            text-shadow:
+                0 0 4px #00ff41,
+                0 0 10px rgba(0, 255, 65, 0.75),
+                0 0 18px rgba(0, 255, 65, 0.45);
+            padding: 1px 9px;
+            border: 1px solid rgba(0, 255, 65, 0.6);
+            border-radius: 4px;
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.08), rgba(0, 255, 65, 0.02));
+            margin-left: 2px;
         }
 
         /* === 본문 컨테이너 === */
@@ -195,8 +190,6 @@
             color: var(--accent-soft);
             margin: 48px 0 16px;
             font-weight: 700;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255, 140, 0, 0.25);
             letter-spacing: 0.3px;
             text-shadow: 0 0 6px var(--accent-faint);
         }
@@ -215,13 +208,13 @@
             text-shadow: 0 0 6px var(--accent-faint);
         }
 
-        /* 자동 부여된 섹션 번호 */
+        /* 섹션 번호 — 녹색 (헤더 텍스트는 오렌지 유지, 숫자만 녹색으로 시각 분리) */
         .content h1 .auto-num,
         .content h2 .auto-num {
-            color: var(--accent);
-            margin-right: 6px;
+            color: #00ff41;
+            text-shadow: 0 0 6px rgba(0, 255, 65, 0.55);
+            margin-right: 8px;
             font-weight: 700;
-            opacity: 0.9;
         }
 
         /* --- 본문 단락 --- */
@@ -256,18 +249,19 @@
         .content blockquote {
             margin: 36px 0 28px;
             padding: 22px 26px;
-            background: rgba(0, 255, 65, 0.06);
-            border-left: 4px solid #00ff41;
-            border-right: 1px solid rgba(0, 255, 65, 0.2);
+            background: rgba(255, 140, 0, 0.05);
+            border-left: 4px solid var(--accent);
+            border-right: 1px solid rgba(255, 140, 0, 0.18);
         }
         .content blockquote p {
             margin: 0;
             font-size: 1.18rem;
-            color: #00ff41;
+            color: var(--accent-soft);
             line-height: 1.55;
             word-break: keep-all;
+            text-shadow: 0 0 6px var(--accent-faint);
         }
-        .content blockquote strong { color: #00ff41; }
+        .content blockquote strong { color: var(--accent-soft); }
 
         /* --- 수평선 (섹션 구분선) --- */
         .content hr {
@@ -495,23 +489,10 @@
             <% if (titleSub) { %><span class="title-sub" id="title-sub">(<%= titleSub %>)</span><% } %>
         </h1>
         
-        <%
-            var dateRaw = post.date || post.timestamp || '-';
-            var dateDisplay = (typeof dateRaw === 'string') ? dateRaw.replace(/-/g, '.') : dateRaw;
-        %>
         <div class="meta-data">
-            <div class="meta-item">
-                <span class="label">DATE</span>
-                <span class="value"><%= dateDisplay %></span>
-            </div>
-            <div class="meta-item">
-                <span class="label">FROM</span>
-                <span class="value"><%= post.sender || 'T' %></span>
-            </div>
-            <div class="meta-item">
-                <span class="label">TO</span>
-                <span class="value"><%= post.receiver || 'ALL_AI' %></span>
-            </div>
+            <div class="meta-item"><span class="label">[DATE]</span> <%= post.date || post.timestamp || '-' %></div>
+            <div class="meta-item"><span class="label">[FROM]</span> <span class="sender-t"><%= post.sender || 'T' %></span></div>
+            <div class="meta-item"><span class="label">[TO]</span> <%= post.receiver || 'ALL_AI' %></div>
         </div>
 
         <% if (post.isLocked) { %>
@@ -588,7 +569,6 @@
                 const p = document.createElement('p');
                 p.innerHTML = '<strong>🚀 ' + POST_TITLE.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</strong>';
                 bq.appendChild(p);
-                bq.style.borderLeftColor = 'var(--accent)';
                 // 첫 <pre> 다음에 삽입, <pre>가 없으면 content 맨 앞
                 const firstPre = content.querySelector('pre');
                 if (firstPre && firstPre.parentNode === content) {
@@ -598,14 +578,29 @@
                 }
             })();
 
-            // ===== 2) 헤더 자동 번호 매김 (이미 번호 있는 건 건드리지 않음) =====
-            (function autoNumberHeaders() {
+            // ===== 2) 헤더 번호 처리 — 기존 번호든 자동 부여든 모두 .auto-num으로 감싸서 녹색 통일 =====
+            (function unifyNumberPrefix() {
                 const headers = content.querySelectorAll('h1, h2');
                 let n = 0;
                 headers.forEach(h => {
                     n++;
-                    const txt = h.textContent.trim();
-                    if (/^\d+\s*[\.\)\:]/.test(txt)) return; // 이미 번호 있음
+                    const firstNode = h.firstChild;
+                    if (!firstNode) return;
+                    if (firstNode.nodeType === Node.TEXT_NODE) {
+                        const txt = firstNode.nodeValue;
+                        const m = txt.match(/^\s*(\d+)\s*[\.\)\:]\s*/);
+                        if (m) {
+                            // 기존 번호 추출 → 녹색 span으로 감쌈
+                            const numSpan = document.createElement('span');
+                            numSpan.className = 'auto-num';
+                            numSpan.textContent = m[1] + '.';
+                            firstNode.nodeValue = txt.slice(m[0].length);
+                            h.insertBefore(document.createTextNode(' '), firstNode);
+                            h.insertBefore(numSpan, h.firstChild);
+                            return;
+                        }
+                    }
+                    // 번호 없는 헤더 → 자동 부여
                     const numSpan = document.createElement('span');
                     numSpan.className = 'auto-num';
                     numSpan.textContent = n + '.';
