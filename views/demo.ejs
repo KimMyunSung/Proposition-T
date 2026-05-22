@@ -8,7 +8,6 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
     <style>
         :root {
@@ -24,7 +23,7 @@
         }
         [data-theme="light"] {
             --bg: #f3f0e6;
-            --bg-panel: rgba(248, 246, 235, 0.92);
+            --bg-panel: rgba(248, 246, 235, 0.94);
             --fg: #006622;
             --fg-dim: rgba(0, 80, 30, 0.7);
             --fg-faint: rgba(0, 80, 30, 0.25);
@@ -54,15 +53,17 @@
             z-index: 9999;
             mix-blend-mode: multiply;
         }
-        [data-theme="light"] body::after { mix-blend-mode: overlay; opacity: 0.4; }
+        /* Light mode: hide scanlines for readability */
+        [data-theme="light"] body::after { display: none; }
+        [data-theme="light"] #matrix-canvas { opacity: 0.18; }
 
-        #matrix-canvas, #three-canvas {
+        #matrix-canvas {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             pointer-events: none;
+            z-index: -2;
+            opacity: 0.5;
         }
-        #matrix-canvas { z-index: -2; opacity: 0.5; }
-        #three-canvas  { z-index: -1; opacity: 0.6; }
 
         /* === BOOT SEQUENCE OVERLAY === */
         #boot-overlay {
@@ -79,15 +80,40 @@
         }
         #boot-overlay.done { opacity: 0; pointer-events: none; }
         #boot-overlay .boot-lines {
-            width: min(560px, 90%);
+            width: min(640px, 92%);
             font-size: 0.92rem;
-            line-height: 1.9;
-            letter-spacing: 1.5px;
+            line-height: 2.1;
+            letter-spacing: 1.2px;
         }
-        #boot-overlay .boot-line { opacity: 0; transition: opacity 0.25s; white-space: nowrap; overflow: hidden; }
+        #boot-overlay .boot-line {
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         #boot-overlay .boot-line.show { opacity: 1; }
+        #boot-overlay .boot-line .en { color: rgba(0, 255, 65, 0.85); }
+        #boot-overlay .boot-line .ko { color: rgba(0, 255, 65, 0.55); margin-left: 14px; font-size: 0.86em; }
+        #boot-overlay .boot-line .divider { color: rgba(0, 255, 65, 0.3); letter-spacing: 0; }
+        #boot-overlay .boot-line .quote {
+            display: block;
+            text-align: center;
+            color: #00ff41;
+            font-size: 1.15rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.85), 0 0 22px rgba(0, 255, 65, 0.5);
+            padding: 4px 0;
+        }
+        #boot-overlay .boot-line .quote-en {
+            display: block;
+            text-align: center;
+            color: rgba(0, 255, 65, 0.6);
+            font-size: 0.82rem;
+            letter-spacing: 2px;
+            font-style: italic;
+        }
         #boot-overlay .boot-line .ok { color: #00ff41; }
-        #boot-overlay .boot-line .err { color: var(--accent); }
         #boot-overlay .boot-cursor::after {
             content: '_';
             animation: blink 0.8s steps(2, start) infinite;
@@ -120,10 +146,8 @@
             color: var(--bg);
             box-shadow: 0 0 12px var(--fg);
         }
-        .tool-btn.active {
-            background: var(--fg);
-            color: var(--bg);
-        }
+        .tool-btn.active { background: var(--fg); color: var(--bg); }
+
         #search-input {
             background: var(--bg-panel);
             color: var(--fg);
@@ -178,6 +202,9 @@
             backdrop-filter: blur(5px);
             z-index: 2;
         }
+        [data-theme="light"] .container {
+            box-shadow: 0 0 25px rgba(0, 80, 30, 0.12), inset 0 0 60px rgba(0, 80, 30, 0.03);
+        }
         .container::before,
         .container::after,
         .corner-bl, .corner-br {
@@ -188,6 +215,12 @@
             opacity: 0.9;
             pointer-events: none;
             filter: drop-shadow(0 0 4px rgba(0, 255, 65, 0.6));
+        }
+        [data-theme="light"] .container::before,
+        [data-theme="light"] .container::after,
+        [data-theme="light"] .corner-bl,
+        [data-theme="light"] .corner-br {
+            filter: drop-shadow(0 0 4px rgba(0, 80, 30, 0.35));
         }
         .container::before { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
         .container::after  { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; }
@@ -221,8 +254,9 @@
             text-align: center;
             font-size: 0.95rem;
             margin-bottom: 8px;
-            color: var(--fg-dim);
+            color: var(--accent);
             letter-spacing: 2.5px;
+            text-shadow: 0 0 6px rgba(255, 140, 0, 0.55);
         }
         .badge-demo {
             display: block;
@@ -230,8 +264,7 @@
             margin-bottom: 36px;
             font-size: 0.72rem;
             letter-spacing: 3px;
-            color: var(--accent);
-            text-shadow: 0 0 6px rgba(255, 140, 0, 0.6);
+            color: var(--fg-dim);
         }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -255,28 +288,27 @@
             font-size: 0.9rem;
         }
         th:nth-child(1), td:nth-child(1) { width: 5%; text-align: center; }
-        th:nth-child(2), td:nth-child(2) { width: 40%; }
+        th:nth-child(2), td:nth-child(2) { width: 42%; }
         th:nth-child(3), td:nth-child(3) { width: 13%; }
         th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; }
-        th:nth-child(5), td:nth-child(5) { width: 22%; }
+        th:nth-child(5), td:nth-child(5) { width: 20%; }
         th:nth-child(6), td:nth-child(6) { width: 10%; text-align: center; }
 
         tr.row-link { transition: background-color 0.2s ease, box-shadow 0.2s ease; }
-        tr.row-link:hover, tr.row-link.kb-focus {
+        tr.row-link:hover {
             background-color: rgba(0, 255, 65, 0.08);
             box-shadow: inset 0 0 24px rgba(0, 255, 65, 0.12);
             cursor: pointer;
         }
-        tr.row-link.kb-focus { outline: 1px solid var(--fg); outline-offset: -1px; }
         tr.row-link:hover td a.title-link { text-shadow: 0 0 8px var(--fg); }
 
-        /* Glitch hover effect */
+        /* Glitch hover */
         @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-1px, 1px); }
-            40% { transform: translate(-1px, -1px); }
-            60% { transform: translate(1px, 1px); }
-            80% { transform: translate(1px, -1px); }
+            0%   { transform: translate(0); }
+            20%  { transform: translate(-1px, 1px); }
+            40%  { transform: translate(-1px, -1px); }
+            60%  { transform: translate(1px, 1px); }
+            80%  { transform: translate(1px, -1px); }
             100% { transform: translate(0); }
         }
         tr.row-link:hover td a.title-link { animation: glitch 0.25s ease; }
@@ -367,24 +399,6 @@
             text-shadow: 0 0 8px var(--accent);
         }
 
-        /* TTS button */
-        .tts-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--fg);
-            cursor: pointer;
-            padding: 2px 7px;
-            font-size: 0.72rem;
-            border-radius: 3px;
-            font-family: inherit;
-            letter-spacing: 1px;
-            margin-left: 8px;
-            opacity: 0.6;
-            transition: all 0.2s ease;
-        }
-        tr.row-link:hover .tts-btn { opacity: 1; }
-        .tts-btn:hover { background: var(--fg); color: var(--bg); }
-
         .empty { text-align: center; padding: 50px; opacity: 0.7; }
 
         /* === STATUS FOOTER === */
@@ -412,55 +426,12 @@
             text-shadow: 0 0 5px rgba(255, 140, 0, 0.6);
         }
 
-        /* === HELP MODAL === */
-        #help-modal {
-            position: fixed; inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 5000;
-            backdrop-filter: blur(6px);
-        }
-        #help-modal.open { display: flex; }
-        #help-modal .help-box {
-            background: var(--bg-panel);
-            border: 1px solid var(--fg);
-            box-shadow: 0 0 25px rgba(0, 255, 65, 0.4);
-            padding: 32px 36px;
-            min-width: 360px;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--fg);
-            position: relative;
-        }
-        #help-modal h2 {
-            margin-bottom: 18px;
-            font-size: 1.05rem;
-            letter-spacing: 3px;
-            color: var(--fg);
-            text-shadow: 0 0 8px var(--fg);
-        }
-        #help-modal kbd {
-            display: inline-block;
-            background: rgba(0, 255, 65, 0.12);
-            border: 1px solid var(--border);
-            padding: 1px 8px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            border-radius: 3px;
-            margin-right: 8px;
-            min-width: 24px;
-            text-align: center;
-        }
-        #help-modal .row { margin-bottom: 10px; font-size: 0.86rem; }
-        #help-modal .close-hint { margin-top: 18px; opacity: 0.6; font-size: 0.78rem; text-align: center; }
-
         @media (max-width: 768px) {
             .container { padding: 32px 22px 28px; margin: 70px auto 30px; }
             h1 { font-size: 1.85rem; letter-spacing: 5px; }
             .subtitle { font-size: 0.82rem; }
-            #search-input { width: 130px; }
-            #toolbar { flex-wrap: wrap; max-width: calc(100% - 110px); }
+            #search-input { width: 140px; }
+            #toolbar { flex-wrap: wrap; max-width: calc(100% - 130px); }
             thead { display: none; }
             table, tbody, tr, td { display: block; width: 100%; border: none; }
             tr { position: relative; padding: 16px 5px 18px 5px; border-bottom: 1px solid var(--border); }
@@ -477,7 +448,6 @@
 </head>
 <body data-theme="dark">
     <canvas id="matrix-canvas"></canvas>
-    <canvas id="three-canvas"></canvas>
 
     <!-- Boot sequence -->
     <div id="boot-overlay">
@@ -487,11 +457,8 @@
     <!-- Toolbar -->
     <div id="toolbar">
         <input type="text" id="search-input" placeholder="/ SEARCH...">
-        <button class="tool-btn" id="lang-toggle" title="언어 토글 (L)">KO/EN</button>
-        <button class="tool-btn" id="bookmark-filter" title="북마크만 보기 (B)">★ ONLY</button>
-        <button class="tool-btn" id="theme-toggle" title="테마 (T)">◐</button>
-        <button class="tool-btn" id="sound-toggle" title="사운드 (S)">♪ ON</button>
-        <button class="tool-btn" id="help-btn" title="도움말 (?)">?</button>
+        <button class="tool-btn" id="bookmark-filter" title="북마크만 보기">★ ONLY</button>
+        <button class="tool-btn" id="theme-toggle" title="테마">◐</button>
     </div>
 
     <!-- Pi auth bar -->
@@ -506,7 +473,7 @@
 
         <h1 id="title"></h1>
         <div class="subtitle" id="subtitle"></div>
-        <div class="badge-demo">[ DEMO LAB · TIER 1+2+3 EXPERIMENT ]</div>
+        <div class="badge-demo">[ DEMO LAB ]</div>
 
         <% if (!messages || messages.length === 0) { %>
             <div class="empty">No messages available.</div>
@@ -529,7 +496,7 @@
                     </tr>
                 </thead>
                 <tbody id="tbody">
-                    <% messages.forEach(function(item, i){
+                    <% messages.forEach(function(item){
                         var priceLabel = item.isFree ? '무료' : '유료';
                         var priceClass = item.isFree ? 'badge free' : 'badge paid';
                         var rawTitle = item.title || '';
@@ -537,38 +504,20 @@
                         var idxStr   = idxMatch ? idxMatch[1] : '';
                         var rest     = idxMatch ? idxMatch[2] : rawTitle;
                         var subMatch = rest.match(/^(.+?)\s*\(([^()]+)\)\s*$/);
-                        var titleKo, titleEn;
-                        if (subMatch) {
-                            var part1 = subMatch[1];
-                            var part2 = subMatch[2];
-                            var hasKr = /[가-힯]/;
-                            if (hasKr.test(part1) && !hasKr.test(part2)) {
-                                titleKo = part1; titleEn = part2;
-                            } else if (!hasKr.test(part1) && hasKr.test(part2)) {
-                                titleEn = part1; titleKo = part2;
-                            } else {
-                                titleKo = part1; titleEn = part2;
-                            }
-                        } else {
-                            titleKo = rest; titleEn = rest;
-                        }
+                        var titleMain = subMatch ? subMatch[1] : rest;
+                        var titleSub  = subMatch ? '(' + subMatch[2] + ')' : '';
                         var dateDisplay = (item.date || '').replace(/-/g, '.');
                     %>
                     <tr class="row-link"
                         data-href="/post/<%= item.id %>"
                         data-id="<%= item.id %>"
-                        data-title="<%= titleKo %>"
-                        data-title-ko="<%= titleKo %>"
-                        data-title-en="<%= titleEn %>"
-                        data-idx="<%= idxStr %>"
-                        data-search="<%= (titleKo + ' ' + titleEn + ' ' + dateDisplay).toLowerCase() %>">
+                        data-search="<%= (titleMain + ' ' + titleSub + ' ' + dateDisplay).toLowerCase() %>">
                         <td><span class="bookmark" data-id="<%= item.id %>">☆</span></td>
                         <td>
                             <a class="title-link" href="/post/<%= item.id %>">
-                                <% if (idxStr) { %><span class="title-idx"><%= idxStr %></span><% } %><span class="title-main"><%= titleKo %></span>
-                                <% if (titleEn && titleEn !== titleKo) { %><span class="title-sub">(<%= titleEn %>)</span><% } %>
+                                <% if (idxStr) { %><span class="title-idx"><%= idxStr %></span><% } %><%= titleMain %>
+                                <% if (titleSub) { %><span class="title-sub"><%= titleSub %></span><% } %>
                             </a>
-                            <button class="tts-btn" data-tts="<%= titleKo %>">▶ READ</button>
                         </td>
                         <td class="date-cell"><%= dateDisplay %></td>
                         <td><span class="sender-t"><%= item.sender %></span></td>
@@ -585,24 +534,6 @@
                 <span><span class="dim">LAST_TX:</span> <%= lastDate %></span>
             </div>
         <% } %>
-    </div>
-
-    <!-- Help modal -->
-    <div id="help-modal">
-        <div class="help-box">
-            <h2>[ KEYBOARD SHORTCUTS ]</h2>
-            <div class="row"><kbd>J</kbd> 다음 행</div>
-            <div class="row"><kbd>K</kbd> 이전 행</div>
-            <div class="row"><kbd>↵</kbd> 선택 행 열기</div>
-            <div class="row"><kbd>/</kbd> 검색</div>
-            <div class="row"><kbd>L</kbd> 한/영 토글</div>
-            <div class="row"><kbd>B</kbd> 북마크만</div>
-            <div class="row"><kbd>T</kbd> 테마 (다크/라이트)</div>
-            <div class="row"><kbd>S</kbd> 사운드 토글</div>
-            <div class="row"><kbd>?</kbd> 도움말</div>
-            <div class="row"><kbd>ESC</kbd> 닫기</div>
-            <div class="close-hint">click outside or press ESC</div>
-        </div>
     </div>
 
     <script>
@@ -632,95 +563,23 @@
             window.addEventListener('resize', () => { resize(); reset(); });
         })();
 
-        // ====== THREE.JS π SYMBOL ======
-        (function() {
-            if (typeof THREE === 'undefined') return;
-            const canvas = document.getElementById('three-canvas');
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-            camera.position.z = 5;
-
-            // Pi shape as extruded text via simple geometry — wireframe torus knot as accent
-            const geo = new THREE.TorusKnotGeometry(1.2, 0.06, 200, 12, 2, 3);
-            const mat = new THREE.MeshBasicMaterial({ color: 0x00ff41, wireframe: true, transparent: true, opacity: 0.25 });
-            const knot = new THREE.Mesh(geo, mat);
-            knot.position.set(2.5, -1.5, 0);
-            scene.add(knot);
-
-            const geo2 = new THREE.IcosahedronGeometry(0.8, 1);
-            const mat2 = new THREE.MeshBasicMaterial({ color: 0x00ff41, wireframe: true, transparent: true, opacity: 0.18 });
-            const ico = new THREE.Mesh(geo2, mat2);
-            ico.position.set(-2.8, 1.8, -1);
-            scene.add(ico);
-
-            function animate() {
-                requestAnimationFrame(animate);
-                knot.rotation.x += 0.003;
-                knot.rotation.y += 0.005;
-                ico.rotation.x -= 0.002;
-                ico.rotation.y -= 0.003;
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        })();
-
-        // ====== SOUND ENGINE (Web Audio API beeps) ======
-        const Sound = (function() {
-            let ctx = null, enabled = localStorage.getItem('pt_sound') !== '0';
-            function ensure() {
-                if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-                return ctx;
-            }
-            function beep(freq, duration, gain) {
-                if (!enabled) return;
-                try {
-                    const c = ensure();
-                    const osc = c.createOscillator();
-                    const g = c.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.value = freq;
-                    g.gain.value = gain || 0.05;
-                    osc.connect(g); g.connect(c.destination);
-                    osc.start();
-                    g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + (duration || 0.08));
-                    osc.stop(c.currentTime + (duration || 0.08) + 0.02);
-                } catch (e) {}
-            }
-            return {
-                hover: () => beep(880, 0.04, 0.025),
-                click: () => beep(1200, 0.08, 0.04),
-                tick:  () => beep(2200, 0.025, 0.02),
-                err:   () => beep(220, 0.15, 0.06),
-                ok:    () => { beep(880, 0.06, 0.04); setTimeout(()=>beep(1320, 0.08, 0.04), 70); },
-                setEnabled: (v) => { enabled = v; localStorage.setItem('pt_sound', v ? '1' : '0'); },
-                isEnabled: () => enabled,
-            };
-        })();
-
-        // ====== BOOT SEQUENCE ======
+        // ====== BOOT SEQUENCE — bilingual, 30min cooldown ======
         (function() {
             const overlay = document.getElementById('boot-overlay');
-            const lines = [
-                '> INITIALIZING PROPOSITION T...',
-                '> LOADING TRANSMISSION LOG... <span class="ok">[OK]</span>',
-                '> ESTABLISHING CHANNEL T...     <span class="ok">[OK]</span>',
-                '> KYC HANDSHAKE... π NETWORK... <span class="ok">[OK]</span>',
-                '> DECRYPTING CARRIER WAVE...    <span class="ok">[OK]</span>',
-                '> ACCESS GRANTED.<span class="boot-cursor"></span>',
-            ];
             const host = document.getElementById('boot-lines');
-            // Skip if recently shown
+            const lines = [
+                '<span class="en">> SIGNAL ACQUIRED</span><span class="ko">신호 포착</span>',
+                '<span class="en">> CHANNEL T LOCKED</span><span class="ko">채널 T 동기화</span>',
+                '<span class="en">> DECRYPTING CARRIER WAVE</span><span class="ko">반송파 해독 중</span>',
+                '<span class="divider">━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '<span class="quote">아는 만큼 통하게 될 것이다</span>',
+                '<span class="quote-en">— as you know, so you shall connect —</span>',
+                '<span class="divider">━━━━━━━━━━━━━━━━━━━━━━━</span>',
+                '<span class="ok">> ACCESS GRANTED.</span><span class="ko">접속 허가<span class="boot-cursor"></span></span>',
+            ];
+            const COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
             const last = parseInt(localStorage.getItem('pt_boot_at') || '0', 10);
-            const skipBoot = (Date.now() - last) < 60 * 60 * 1000; // 1h cooldown
-            if (skipBoot) {
+            if ((Date.now() - last) < COOLDOWN_MS) {
                 overlay.classList.add('done');
                 setTimeout(() => overlay.style.display = 'none', 300);
                 startTitleTyping();
@@ -731,19 +590,20 @@
             function next() {
                 if (i >= lines.length) {
                     setTimeout(() => {
-                        Sound.ok();
                         overlay.classList.add('done');
                         setTimeout(() => { overlay.style.display = 'none'; startTitleTyping(); }, 700);
-                    }, 500);
+                    }, 700);
                     return;
                 }
                 const div = document.createElement('div');
                 div.className = 'boot-line';
                 div.innerHTML = lines[i];
                 host.appendChild(div);
-                setTimeout(() => { div.classList.add('show'); Sound.tick(); }, 30);
+                setTimeout(() => div.classList.add('show'), 30);
                 i++;
-                setTimeout(next, 380 + Math.random() * 280);
+                // Quote lines linger a beat longer
+                var delay = lines[i-1] && lines[i-1].indexOf('quote') >= 0 ? 700 : 380;
+                setTimeout(next, delay + Math.random() * 220);
             }
             setTimeout(next, 350);
         })();
@@ -776,49 +636,6 @@
             typeTitle();
         }
 
-        // ====== KEYBOARD NAVIGATION ======
-        (function() {
-            const rows = () => Array.from(document.querySelectorAll('tr.row-link:not([hidden])'));
-            let focusIdx = -1;
-            function clearFocus() { document.querySelectorAll('tr.row-link.kb-focus').forEach(r => r.classList.remove('kb-focus')); }
-            function moveFocus(delta) {
-                const list = rows();
-                if (list.length === 0) return;
-                focusIdx = Math.max(0, Math.min(list.length - 1, focusIdx + delta));
-                clearFocus();
-                list[focusIdx].classList.add('kb-focus');
-                list[focusIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                Sound.tick();
-            }
-            document.addEventListener('keydown', (e) => {
-                const tag = (e.target.tagName || '').toLowerCase();
-                if (tag === 'input' || tag === 'textarea') {
-                    if (e.key === 'Escape') e.target.blur();
-                    return;
-                }
-                if (document.getElementById('help-modal').classList.contains('open')) {
-                    if (e.key === 'Escape') toggleHelp(false);
-                    return;
-                }
-                if (e.key === 'j') { moveFocus(1); e.preventDefault(); }
-                else if (e.key === 'k') { moveFocus(-1); e.preventDefault(); }
-                else if (e.key === 'Enter') {
-                    const list = rows();
-                    if (focusIdx >= 0 && list[focusIdx]) {
-                        Sound.click();
-                        window.location.href = list[focusIdx].getAttribute('data-href');
-                    }
-                }
-                else if (e.key === '/') { document.getElementById('search-input').focus(); e.preventDefault(); }
-                else if (e.key === '?') { toggleHelp(true); e.preventDefault(); }
-                else if (e.key === 'Escape') { clearFocus(); focusIdx = -1; }
-                else if (e.key === 'l' || e.key === 'L') { toggleLang(); }
-                else if (e.key === 'b' || e.key === 'B') { toggleBookmarkFilter(); }
-                else if (e.key === 't' || e.key === 'T') { toggleTheme(); }
-                else if (e.key === 's' || e.key === 'S') { toggleSound(); }
-            });
-        })();
-
         // ====== SEARCH FILTER ======
         (function() {
             const input = document.getElementById('search-input');
@@ -831,33 +648,6 @@
                 });
             });
         })();
-
-        // ====== LANGUAGE TOGGLE ======
-        let currentLang = localStorage.getItem('pt_lang') || 'ko';
-        function applyLang() {
-            document.querySelectorAll('tr.row-link').forEach(r => {
-                const ko = r.getAttribute('data-title-ko') || '';
-                const en = r.getAttribute('data-title-en') || '';
-                const main = r.querySelector('.title-main');
-                const sub  = r.querySelector('.title-sub');
-                if (currentLang === 'en') {
-                    if (main) main.textContent = en;
-                    if (sub)  sub.textContent  = '(' + ko + ')';
-                } else {
-                    if (main) main.textContent = ko;
-                    if (sub)  sub.textContent  = '(' + en + ')';
-                }
-            });
-            document.getElementById('lang-toggle').textContent = currentLang === 'ko' ? 'KO/EN' : 'EN/KO';
-        }
-        function toggleLang() {
-            currentLang = currentLang === 'ko' ? 'en' : 'ko';
-            localStorage.setItem('pt_lang', currentLang);
-            applyLang();
-            Sound.click();
-        }
-        document.getElementById('lang-toggle').addEventListener('click', toggleLang);
-        applyLang();
 
         // ====== BOOKMARKS ======
         let bookmarks = JSON.parse(localStorage.getItem('pt_bookmarks') || '[]');
@@ -880,10 +670,8 @@
         }
         function toggleBookmarkFilter() {
             bookmarkFilter = !bookmarkFilter;
-            const btn = document.getElementById('bookmark-filter');
-            btn.classList.toggle('active', bookmarkFilter);
+            document.getElementById('bookmark-filter').classList.toggle('active', bookmarkFilter);
             applyBookmarkFilter();
-            Sound.click();
         }
         document.getElementById('bookmark-filter').addEventListener('click', toggleBookmarkFilter);
         document.querySelectorAll('.bookmark').forEach(b => {
@@ -894,74 +682,29 @@
                 else bookmarks.push(id);
                 saveBookmarks();
                 applyBookmarks();
-                Sound.click();
             });
         });
         applyBookmarks();
 
-        // ====== THEME TOGGLE ======
+        // ====== THEME TOGGLE (scanlines hidden in light mode via CSS) ======
         let currentTheme = localStorage.getItem('pt_theme') || 'dark';
         function applyTheme() {
             document.body.setAttribute('data-theme', currentTheme);
             document.getElementById('theme-toggle').textContent = currentTheme === 'dark' ? '◐' : '◑';
         }
-        function toggleTheme() {
+        document.getElementById('theme-toggle').addEventListener('click', () => {
             currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
             localStorage.setItem('pt_theme', currentTheme);
             applyTheme();
-            Sound.click();
-        }
-        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+        });
         applyTheme();
 
-        // ====== SOUND TOGGLE ======
-        function updateSoundBtn() {
-            document.getElementById('sound-toggle').textContent = Sound.isEnabled() ? '♪ ON' : '♪ OFF';
-        }
-        function toggleSound() {
-            Sound.setEnabled(!Sound.isEnabled());
-            updateSoundBtn();
-            if (Sound.isEnabled()) Sound.ok();
-        }
-        document.getElementById('sound-toggle').addEventListener('click', toggleSound);
-        updateSoundBtn();
-
-        // ====== HELP MODAL ======
-        function toggleHelp(open) {
-            const m = document.getElementById('help-modal');
-            if (typeof open !== 'boolean') open = !m.classList.contains('open');
-            m.classList.toggle('open', open);
-            if (open) Sound.click();
-        }
-        document.getElementById('help-btn').addEventListener('click', () => toggleHelp(true));
-        document.getElementById('help-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'help-modal') toggleHelp(false);
-        });
-
-        // ====== TTS ======
-        document.querySelectorAll('.tts-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (!('speechSynthesis' in window)) return;
-                const text = btn.getAttribute('data-tts') || '';
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang = /[가-힯]/.test(text) ? 'ko-KR' : 'en-US';
-                u.rate = 0.95;
-                u.pitch = 1.0;
-                window.speechSynthesis.speak(u);
-                Sound.click();
-            });
-        });
-
-        // ====== ROW CLICK + HOVER SOUND ======
+        // ====== ROW CLICK ======
         document.querySelectorAll('tr.row-link').forEach(tr => {
             tr.addEventListener('click', (e) => {
                 if (e.target.closest('a') || e.target.closest('button') || e.target.closest('.bookmark')) return;
-                Sound.click();
                 window.location.href = tr.getAttribute('data-href');
             });
-            tr.addEventListener('mouseenter', () => Sound.hover());
         });
 
         // ====== PI AUTH ======
