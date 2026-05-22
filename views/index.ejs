@@ -349,8 +349,8 @@
                         var priceLabel = item.isFree ? '무료' : '유료';
                         var priceClass = item.isFree ? 'badge free' : 'badge paid';
                         var rawTitle = item.title || '';
-                        // "Message #016: ..." 에서 번호 추출, 칩으로 분리
-                        var idxMatch = rawTitle.match(/^Message\s*#(\d+)\s*:\s*(.+)$/i);
+                        // "Message #NNN:" 표준 + "Massage" 같은 오타도 허용 — #NNN: 패턴만 잡음
+                        var idxMatch = rawTitle.match(/#(\d+)\s*:\s*(.+)$/);
                         var idxStr   = idxMatch ? idxMatch[1] : '';
                         var rest     = idxMatch ? idxMatch[2] : rawTitle;
                         // 남은 제목에서 끝의 (번역) 부분을 둘째 줄로 분리

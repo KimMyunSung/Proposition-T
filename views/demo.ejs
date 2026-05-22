@@ -56,6 +56,9 @@
         /* Light mode: 가로 줄·매트릭스 비 모두 숨김 — 깨끗한 종이 느낌 */
         [data-theme="light"] body::after { display: none; }
         [data-theme="light"] #matrix-canvas { display: none; }
+        /* 라이트 모드 — 테이블 가로 구분선 거의 안 보이게, 헤더 밑줄 한 줄만 유지 */
+        [data-theme="light"] td { border-bottom: 1px solid rgba(0, 80, 30, 0.07); }
+        [data-theme="light"] .status-line { border-top-color: rgba(0, 80, 30, 0.18); }
 
         #matrix-canvas {
             position: fixed; top: 0; left: 0;
@@ -80,38 +83,40 @@
         }
         #boot-overlay.done { opacity: 0; pointer-events: none; }
         #boot-overlay .boot-lines {
-            width: min(640px, 92%);
-            font-size: 0.92rem;
-            line-height: 2.1;
-            letter-spacing: 1.2px;
+            width: min(780px, 94%);
+            font-size: 1.15rem;
+            line-height: 2.3;
+            letter-spacing: 1.5px;
+            text-align: center;
         }
         #boot-overlay .boot-line {
             opacity: 0;
             transition: opacity 0.3s;
-            white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis;
+            text-align: center;
         }
         #boot-overlay .boot-line.show { opacity: 1; }
-        #boot-overlay .boot-line .en { color: rgba(0, 255, 65, 0.85); }
-        #boot-overlay .boot-line .ko { color: rgba(0, 255, 65, 0.55); margin-left: 14px; font-size: 0.86em; }
-        #boot-overlay .boot-line .divider { color: rgba(0, 255, 65, 0.3); letter-spacing: 0; }
+        #boot-overlay .boot-line .en { color: rgba(0, 255, 65, 0.9); display: inline-block; }
+        #boot-overlay .boot-line .ko { color: rgba(0, 255, 65, 0.6); margin-left: 18px; font-size: 0.95em; display: inline-block; }
+        #boot-overlay .boot-line .divider { color: rgba(0, 255, 65, 0.3); letter-spacing: 0; display: inline-block; }
         #boot-overlay .boot-line .quote {
             display: block;
             text-align: center;
             color: #00ff41;
-            font-size: 1.15rem;
-            letter-spacing: 3px;
-            text-shadow: 0 0 10px rgba(0, 255, 65, 0.85), 0 0 22px rgba(0, 255, 65, 0.5);
-            padding: 4px 0;
+            font-size: 1.7rem;
+            letter-spacing: 5px;
+            text-shadow: 0 0 12px rgba(0, 255, 65, 0.9), 0 0 28px rgba(0, 255, 65, 0.55);
+            padding: 8px 0 2px;
+            font-weight: 700;
         }
         #boot-overlay .boot-line .quote-en {
             display: block;
             text-align: center;
-            color: rgba(0, 255, 65, 0.6);
-            font-size: 0.82rem;
-            letter-spacing: 2px;
+            color: rgba(0, 255, 65, 0.7);
+            font-size: 1rem;
+            letter-spacing: 3px;
             font-style: italic;
+            padding-bottom: 6px;
         }
         #boot-overlay .boot-line .ok { color: #00ff41; }
         #boot-overlay .boot-cursor::after {
@@ -500,7 +505,8 @@
                         var priceLabel = item.isFree ? '무료' : '유료';
                         var priceClass = item.isFree ? 'badge free' : 'badge paid';
                         var rawTitle = item.title || '';
-                        var idxMatch = rawTitle.match(/^Message\s*#(\d+)\s*:\s*(.+)$/i);
+                        // "Message #NNN:" 가 표준이지만 "Massage" 같은 오타도 허용 — #NNN: 패턴만 잡음
+                        var idxMatch = rawTitle.match(/#(\d+)\s*:\s*(.+)$/);
                         var idxStr   = idxMatch ? idxMatch[1] : '';
                         var rest     = idxMatch ? idxMatch[2] : rawTitle;
                         var subMatch = rest.match(/^(.+?)\s*\(([^()]+)\)\s*$/);
