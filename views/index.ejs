@@ -78,6 +78,8 @@
         .title-sub { display: block; margin-top: 4px; font-size: 0.78rem; font-weight: 400; color: rgba(0, 255, 65, 0.55); letter-spacing: 0.3px; }
         .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; border: 1px solid #00ff41; }
         .badge.live { background-color: #00ff41; color: #000; box-shadow: 0 0 8px #00ff41; }
+        .badge.free { background-color: rgba(0, 255, 65, 0.15); color: #00ff41; }
+        .badge.paid { background-color: transparent; color: rgba(0, 255, 65, 0.55); border-color: rgba(0, 255, 65, 0.45); }
         .empty { text-align: center; padding: 50px; opacity: 0.7; }
 
         /* === Pi Auth Bar === */
@@ -151,12 +153,13 @@
                         <th>DATE</th>
                         <th>SENDER</th>
                         <th>RECEIVER</th>
-                        <th>FREE</th>
+                        <th>요금</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% messages.forEach(function(item){
-                        var freeIcon = item.isFree ? '▣' : '□';
+                        var priceLabel = item.isFree ? '무료' : '유료';
+                        var priceClass = item.isFree ? 'badge free' : 'badge paid';
                         // 제목 끝의 괄호 부분(번역/부제)을 둘째 줄로 분리
                         var m = (item.title || '').match(/^(.+?)\s*\(([^()]+)\)\s*$/);
                         var titleMain = m ? m[1] : item.title;
@@ -172,7 +175,7 @@
                         <td><%= item.date %></td>
                         <td><%= item.sender %></td>
                         <td><%= item.receiver %></td>
-                        <td><%= freeIcon %></td>
+                        <td><span class="<%= priceClass %>"><%= priceLabel %></span></td>
                     </tr>
                     <% }); %>
                 </tbody>
