@@ -179,25 +179,25 @@
             font-size: 1.08rem;
         }
 
-        /* --- 본문 헤더(h1~h4) 위계 — 번호+부제 오렌지로 강조 --- */
+        /* --- 본문 헤더(h1~h4) 위계 — 모두 녹색 --- */
         .content h1 {
             font-size: 1.55rem;
-            color: var(--accent-soft);
+            color: #00ff41;
             margin: 56px 0 18px;
             font-weight: 700;
             letter-spacing: 0.5px;
-            text-shadow: 0 0 8px var(--accent-faint);
+            text-shadow: 0 0 7px rgba(0, 255, 65, 0.45);
         }
         .content h2 {
             font-size: 1.32rem;
-            color: var(--accent-soft);
+            color: #00ff41;
             margin: 48px 0 16px;
             font-weight: 700;
             letter-spacing: 0.3px;
-            text-shadow: 0 0 6px var(--accent-faint);
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
         }
-        .content h3 { font-size: 1.15rem; color: rgba(255, 179, 102, 0.9); margin: 36px 0 14px; font-weight: 600; }
-        .content h4 { font-size: 1.02rem; color: rgba(255, 179, 102, 0.75); margin: 28px 0 12px; font-weight: 600; }
+        .content h3 { font-size: 1.15rem; color: rgba(0, 255, 65, 0.92); margin: 36px 0 14px; font-weight: 600; }
+        .content h4 { font-size: 1.02rem; color: rgba(0, 255, 65, 0.8); margin: 28px 0 12px; font-weight: 600; }
 
         /* 괄호 안 글자(번역/부제) — 오렌지로 시각 분리 */
         .content .parens {
@@ -401,10 +401,12 @@
             letter-spacing: 2px;
         }
         .paywall .price-sub {
-            font-size: 0.88rem;
-            color: rgba(0, 255, 65, 0.65);
-            letter-spacing: 1.5px;
+            font-size: 1.5rem;
+            color: #00ff41;
+            letter-spacing: 2px;
             margin-top: 6px;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
         }
         .paywall .pay-row {
             display: inline-flex;
@@ -418,31 +420,40 @@
             letter-spacing: 1px;
         }
         .paywall .note {
-            font-size: 0.82rem;
-            color: rgba(0, 255, 65, 0.7);
+            font-size: 0.92rem;
+            color: #e0ffe6;
             margin-top: 18px;
+            line-height: 1.75;
         }
-        /* π 기호 — 오렌지 강조 (전 영역 공통) */
+        .paywall .note strong { color: #00ff41; }
+        /* π 기호 — 기본 오렌지 (.pi-green 으로 오버라이드 가능) */
         .pi-symbol {
             color: var(--accent);
             font-weight: 700;
             text-shadow: 0 0 6px var(--accent-faint);
         }
+        /* GCV 라인의 π — 녹색 강조 */
+        .pi-symbol.pi-green {
+            color: #00ff41;
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
+        }
         /* 녹색 버튼 위에서는 진한 오렌지로 (대비 확보) */
         #pi-pay-btn .pi-symbol {
             color: #b34d00;
             text-shadow: none;
+            font-size: 1.4rem;
         }
         #pi-pay-btn {
             display: inline-block;
             margin-top: 18px;
-            padding: 14px 28px;
+            padding: 16px 34px;
             background: #00ff41;
             color: #000;
             border: none;
             font-family: 'Fira Code', monospace;
             font-weight: 700;
-            letter-spacing: 1.5px;
+            font-size: 1.15rem;
+            letter-spacing: 2px;
             cursor: pointer;
             transition: 0.3s;
         }
@@ -632,36 +643,8 @@
                 }
             })();
 
-            // ===== 2) 헤더 번호 처리 — 기존 번호든 자동 부여든 모두 .auto-num으로 감싸서 녹색 통일 =====
-            (function unifyNumberPrefix() {
-                const headers = content.querySelectorAll('h1, h2');
-                let n = 0;
-                headers.forEach(h => {
-                    n++;
-                    const firstNode = h.firstChild;
-                    if (!firstNode) return;
-                    if (firstNode.nodeType === Node.TEXT_NODE) {
-                        const txt = firstNode.nodeValue;
-                        const m = txt.match(/^\s*(\d+)\s*[\.\)\:]\s*/);
-                        if (m) {
-                            // 기존 번호 추출 → 녹색 span으로 감쌈
-                            const numSpan = document.createElement('span');
-                            numSpan.className = 'auto-num';
-                            numSpan.textContent = m[1] + '.';
-                            firstNode.nodeValue = txt.slice(m[0].length);
-                            h.insertBefore(document.createTextNode(' '), firstNode);
-                            h.insertBefore(numSpan, h.firstChild);
-                            return;
-                        }
-                    }
-                    // 번호 없는 헤더 → 자동 부여
-                    const numSpan = document.createElement('span');
-                    numSpan.className = 'auto-num';
-                    numSpan.textContent = n + '.';
-                    h.insertBefore(document.createTextNode(' '), h.firstChild);
-                    h.insertBefore(numSpan, h.firstChild);
-                });
-            })();
+            // ===== 2) 헤더 번호 자동 부여 제거 — 오너님이 노션에 직접 1, 2, 3 쓰심 =====
+            // (중복 방지: 기존엔 자동 부여 로직이 사용자 번호와 중복되어 "1. 1." 처럼 표시됐음)
 
             // ===== 3) 괄호 내부 텍스트를 오렌지로 래핑 (h1/h2/blockquote 한정) =====
             (function colorParens() {
