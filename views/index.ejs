@@ -80,11 +80,11 @@
         .badge.live { background-color: #00ff41; color: #000; box-shadow: 0 0 8px #00ff41; }
         .badge.free { background-color: rgba(0, 255, 65, 0.15); color: #00ff41; }
         .badge.paid {
-            background-color: rgba(178, 102, 255, 0.18);
-            color: #d9b3ff;
-            border-color: #b266ff;
-            text-shadow: 0 0 6px rgba(178, 102, 255, 0.9);
-            box-shadow: 0 0 10px rgba(178, 102, 255, 0.55), inset 0 0 8px rgba(178, 102, 255, 0.25);
+            background-color: rgba(255, 140, 0, 0.18);
+            color: #ffb366;
+            border-color: #ff8c00;
+            text-shadow: 0 0 6px rgba(255, 140, 0, 0.9);
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.55), inset 0 0 8px rgba(255, 140, 0, 0.25);
         }
         .sender-t {
             display: inline-block;
@@ -101,19 +101,7 @@
             border: 1px solid rgba(0, 255, 65, 0.6);
             border-radius: 4px;
             background: linear-gradient(135deg, rgba(0, 255, 65, 0.08), rgba(0, 255, 65, 0.02));
-            position: relative;
         }
-        .sender-t::before,
-        .sender-t::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 10px;
-            height: 1px;
-            background: rgba(0, 255, 65, 0.55);
-        }
-        .sender-t::before { left: -14px; }
-        .sender-t::after  { right: -14px; }
         .empty { text-align: center; padding: 50px; opacity: 0.7; }
 
         /* === Pi Auth Bar === */
