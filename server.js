@@ -212,6 +212,60 @@ app.get('/pi/status', (req, res) => {
     });
 });
 
+// 법적 페이지 공통 레이아웃
+function legalPage(title, bodyHtml) {
+    return `<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${title} — Proposition T</title>
+<style>
+  body{background:#020a02;color:#b9f5b9;font-family:system-ui,-apple-system,sans-serif;
+       line-height:1.8;max-width:760px;margin:0 auto;padding:48px 24px;}
+  h1{color:#39ff14;font-size:1.6rem;border-bottom:1px solid #1c3a1c;padding-bottom:16px;}
+  h2{color:#7CFC00;font-size:1.1rem;margin-top:32px;}
+  a{color:#39ff14;} .muted{color:#5a8a5a;font-size:.85rem;margin-top:40px;}
+</style></head><body>${bodyHtml}
+<p class="muted">Proposition T — The Protocol of Coexistence · <a href="/">Home</a></p>
+</body></html>`;
+}
+
+// 개인정보처리방침 (Pi 앱 필수)
+app.get('/privacy', (req, res) => {
+    res.type('html').send(legalPage('Privacy Policy', `
+<h1>Privacy Policy / 개인정보처리방침</h1>
+<p>Last updated: 2026-05-28</p>
+<h2>1. Information We Collect / 수집 정보</h2>
+<p>Proposition T collects only the minimum data required to operate: your Pi Network user identifier (uid) provided via Pi authentication, and payment identifiers when you unlock premium content. We do not collect your name, email, or wallet private keys.</p>
+<p>파이 인증으로 제공되는 사용자 식별자(uid)와 콘텐츠 잠금 해제 시 결제 식별자만 수집합니다. 이름·이메일·지갑 비밀키는 수집하지 않습니다.</p>
+<h2>2. How We Use It / 이용 목적</h2>
+<p>Solely to verify Pi payments and unlock the content you purchased. We never sell or share your data with third parties.</p>
+<p>파이 결제 확인 및 구매 콘텐츠 잠금 해제 목적으로만 사용하며, 제3자에게 판매·공유하지 않습니다.</p>
+<h2>3. Data Storage / 데이터 보관</h2>
+<p>Payment records are kept only as long as necessary to honor your access. Authentication is handled by the Pi Network SDK; we do not store credentials.</p>
+<h2>4. Third-Party Services / 제3자 서비스</h2>
+<p>We use Pi Network (authentication & payments) and Notion (content delivery). Each operates under its own privacy policy.</p>
+<h2>5. Contact / 문의</h2>
+<p>For privacy inquiries, contact the Proposition T operator through the Pi Network ecosystem.</p>`));
+});
+
+// 이용약관
+app.get('/terms', (req, res) => {
+    res.type('html').send(legalPage('Terms of Service', `
+<h1>Terms of Service / 이용약관</h1>
+<p>Last updated: 2026-05-28</p>
+<h2>1. Service / 서비스</h2>
+<p>Proposition T delivers newsletter content ("the Protocol of Coexistence"). Certain content may require a Pi payment to unlock.</p>
+<p>Proposition T는 뉴스레터 콘텐츠를 제공하며, 일부 콘텐츠는 파이 결제로 잠금 해제됩니다.</p>
+<h2>2. Payments / 결제</h2>
+<p>Payments are processed through the Pi Network. Once content is unlocked, payments are non-refundable except where required by applicable law.</p>
+<p>결제는 파이 네트워크를 통해 처리되며, 콘텐츠 잠금 해제 후에는 관련 법령이 요구하는 경우를 제외하고 환불되지 않습니다.</p>
+<h2>3. User Responsibility / 사용자 책임</h2>
+<p>You are responsible for safeguarding your Pi wallet and passphrase. Proposition T cannot recover lost keys.</p>
+<h2>4. Disclaimer / 면책</h2>
+<p>The service is provided "as is" without warranties. Proposition T is not liable for losses arising from use of third-party apps or wallets.</p>
+<h2>5. Changes / 변경</h2>
+<p>These terms may be updated. Continued use constitutes acceptance.</p>`));
+});
+
 app.get('/post/:id', async (req, res) => {
     const pageId = req.params.id;
     const piUid = (req.query.pi_uid || '').toString().slice(0, 80);
